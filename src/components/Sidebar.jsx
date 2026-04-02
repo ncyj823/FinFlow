@@ -1,44 +1,18 @@
 import React, { useState, useEffect, useRef } from 'react';
 
 const NAV_ITEMS = [
-  { id: 'dashboard',    label: 'Dashboard',    icon: (
-    <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.5">
-      <rect x="1" y="1" width="6" height="6" rx="1.5"/>
-      <rect x="9" y="1" width="6" height="6" rx="1.5"/>
-      <rect x="1" y="9" width="6" height="6" rx="1.5"/>
-      <rect x="9" y="9" width="6" height="6" rx="1.5"/>
-    </svg>
-  )},
-  { id: 'transactions', label: 'Transactions', icon: (
-    <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.5">
-      <path d="M2 4h12M2 8h8M2 12h5"/>
-    </svg>
-  )},
-  { id: 'insights',     label: 'Insights',     icon: (
-    <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.5">
-      <path d="M2 12L5.5 8l3 3L14 4"/>
-    </svg>
-  )},
-  { id: 'budgets',      label: 'Budgets',      icon: (
-    <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.5">
-      <circle cx="8" cy="8" r="6"/><path d="M8 5v3l2 2"/>
-    </svg>
-  )},
-  { id: 'recurring',    label: 'Recurring',    icon: (
-    <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.5">
-      <path d="M2 8a6 6 0 1 1 1.5 4M2 12V8h4"/>
-    </svg>
-  )},
-  { id: 'ai-insights',  label: 'AI Advisor',   icon: (
-    <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.5">
-      <path d="M8 2a5 5 0 0 1 0 10H5l-3 2V8a5 5 0 0 1 6-6z"/>
-    </svg>
-  )},
+  { id: 'dashboard',    icon: '◈', label: 'Dashboard' },
+  { id: 'transactions', icon: '⇄', label: 'Transactions' },
+  { id: 'insights',     icon: '◎', label: 'Insights' },
+  { id: 'budgets',      icon: '▦', label: 'Budgets' },
+  { id: 'recurring',    icon: '↺', label: 'Recurring' },
+  { id: 'ai-insights',  icon: '✦', label: 'AI Insights' },
 ];
 
 export default function Sidebar({ active, onNavigate, role, onRoleChange }) {
   const [activeIndex, setActiveIndex] = useState(0);
   const [yOffset, setYOffset] = useState(0);
+  const [roleBadgeKey, setRoleBadgeKey] = useState(0);
   const listRef = useRef(null);
 
   useEffect(() => {
@@ -58,6 +32,11 @@ export default function Sidebar({ active, onNavigate, role, onRoleChange }) {
     }
   }, [activeIndex]);
 
+  const handleRoleChange = (val) => {
+    onRoleChange(val);
+    setRoleBadgeKey(k => k + 1);
+  };
+
   return (
     <aside style={styles.sidebar}>
       {/* Logo */}
@@ -65,26 +44,26 @@ export default function Sidebar({ active, onNavigate, role, onRoleChange }) {
         <div style={styles.logoMark}>F</div>
         <div>
           <div style={styles.logoText}>FinFlow</div>
-          <div style={styles.logoSub}>Dashboard</div>
+          <div style={styles.logoSub}>Finance Tracker</div>
         </div>
       </div>
 
       {/* Nav */}
       <nav style={styles.nav}>
-        <div style={styles.navLabel}>Navigation</div>
+        <div style={styles.navLabel}>Menu</div>
         <div ref={listRef} style={{ position: 'relative' }}>
           {/* Sliding Active Indicator */}
           <div
             style={{
               position: 'absolute',
-              left: 0,
-              width: 3,
-              height: 20,
-              borderRadius: 3,
-              background: 'var(--accent)',
-              transform: `translateY(${yOffset}px)`,
-              transition: 'transform 200ms cubic-bezier(0.4, 0, 0.2, 1)',
-              zIndex: 2,
+              left: 12,
+              right: 12,
+              height: 36,
+              borderRadius: 8,
+              background: 'rgba(79,143,255,0.12)',
+              transform: `translateY(${yOffset - 8}px)`,
+              transition: 'transform 300ms cubic-bezier(0.34, 1.56, 0.64, 1)',
+              zIndex: 0,
             }}
           />
           {NAV_ITEMS.map((item, i) => (
@@ -93,10 +72,18 @@ export default function Sidebar({ active, onNavigate, role, onRoleChange }) {
               style={{
                 ...styles.navItem,
                 ...(active === item.id ? styles.navItemActive : {}),
-                animationDelay: `${0.06 + i * 0.06}s`,
+                animationDelay: `${0.1 + i * 0.055}s`,
               }}
               className="nav-item-btn"
               onClick={() => onNavigate(item.id)}
+              onMouseEnter={e => {
+                e.currentTarget.style.transform = 'translateX(3px)';
+                e.currentTarget.style.color = 'var(--text)';
+              }}
+              onMouseLeave={e => {
+                e.currentTarget.style.transform = 'translateX(0)';
+                e.currentTarget.style.color = active === item.id ? 'var(--accent)' : 'var(--muted)';
+              }}
             >
               <span style={styles.navIcon}>{item.icon}</span>
               {item.label}
@@ -106,21 +93,24 @@ export default function Sidebar({ active, onNavigate, role, onRoleChange }) {
       </nav>
 
       {/* Role */}
-      <div style={styles.roleSection}>
+      <div style={{...styles.roleSection}}>
         <div style={styles.roleLabel}>Role</div>
         <select
           value={role}
-          onChange={e => onRoleChange(e.target.value)}
+          onChange={e => handleRoleChange(e.target.value)}
           style={styles.roleSelect}
         >
           <option value="admin">Admin</option>
           <option value="viewer">Viewer</option>
         </select>
-        <div style={{
-          ...styles.roleBadge,
-          ...(role === 'admin' ? styles.badgeAdmin : styles.badgeViewer),
-          animation: 'floatBadge 4s ease-in-out infinite',
-        }}>
+        <div
+          key={roleBadgeKey}
+          style={{
+            ...styles.roleBadge,
+            ...(role === 'admin' ? styles.badgeAdmin : styles.badgeViewer),
+            animation: 'roleBadgeAnim 0.35s cubic-bezier(0.34, 1.56, 0.64, 1) both',
+          }}
+        >
           ● {role === 'admin' ? 'Admin Access' : 'View Only'}
         </div>
       </div>
@@ -136,12 +126,13 @@ const styles = {
     display: 'flex', flexDirection: 'column',
     position: 'sticky', top: 0, height: '100vh',
     overflowY: 'auto',
+    animation: 'sidebarSlide 0.45s cubic-bezier(0.4, 0, 0.2, 1) both',
   },
   logo: {
     padding: '24px 20px 20px',
     borderBottom: '1px solid var(--border)',
     display: 'flex', alignItems: 'center', gap: 10,
-    animation: 'slideFromLeft 0.5s cubic-bezier(.4,0,.2,1) both',
+    animation: 'logoFadeIn 0.4s cubic-bezier(0.4, 0, 0.2, 1) 0.15s both',
   },
   logoMark: {
     width: 32, height: 32,
@@ -153,7 +144,7 @@ const styles = {
   },
   logoText: { fontSize: 15, fontWeight: 600, color: 'var(--text)', letterSpacing: '-0.3px' },
   logoSub:  { fontSize: 10, color: 'var(--muted)', letterSpacing: '0.5px', textTransform: 'uppercase' },
-  nav: { padding: '16px 12px', flex: 1 },
+  nav: { padding: '16px 12px', flex: 1, position: 'relative' },
   navLabel: {
     fontSize: 10, letterSpacing: 1, textTransform: 'uppercase',
     color: 'var(--muted)', padding: '0 8px', marginBottom: 8,
@@ -166,10 +157,10 @@ const styles = {
     border: 'none', background: 'none',
     width: '100%', textAlign: 'left',
     fontFamily: 'var(--font-sans)',
-    position: 'relative', overflow: 'hidden',
-    transition: 'all 0.18s cubic-bezier(.4,0,.2,1)',
+    position: 'relative', zIndex: 1, overflow: 'hidden',
+    transition: 'all 0.18s cubic-bezier(0.4, 0, 0.2, 1)',
     marginBottom: 2,
-    animation: 'slideFromLeft 0.5s cubic-bezier(.4,0,.2,1) both',
+    animation: 'navItemSlide 0.35s cubic-bezier(0.4, 0, 0.2, 1) both',
   },
   navItemActive: {
     background: 'rgba(79,143,255,0.12)',
@@ -181,7 +172,7 @@ const styles = {
   roleSection: {
     padding: 16,
     borderTop: '1px solid var(--border)',
-    animation: 'fadeUp 0.5s 0.4s both',
+    animation: 'roleSectionFadeIn 0.4s cubic-bezier(0.4, 0, 0.2, 1) 0.5s both',
   },
   roleLabel: {
     fontSize: 10, letterSpacing: 1, textTransform: 'uppercase',
@@ -196,7 +187,9 @@ const styles = {
     padding: '8px 10px',
     fontSize: 12,
     fontFamily: 'var(--font-sans)',
-    cursor: 'pointer', outline: 'none',
+    cursor: 'pointer',
+    outline: 'none',
+    transition: 'border-color 0.2s',
   },
   roleBadge: {
     display: 'inline-flex', alignItems: 'center', gap: 5,

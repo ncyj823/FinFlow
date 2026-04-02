@@ -1,43 +1,51 @@
-import React, { useEffect, useRef } from 'react';
+import React, { useEffect, useRef, useState, useCallback } from 'react';
+import { motion, AnimatePresence, useMotionValue, useTransform, useSpring } from 'framer-motion';
 
-/* ── FLOATING CARD ── */
+/* ── MAGNETIC TILT CARD ── */
 export function Card({ children, style, floatIndex = 0, hover = true, className = '', ...rest }) {
-  const floatAnims = ['levitate', 'levitate2', 'levitate3'];
-  const durations  = [6, 7, 5.5, 8, 6.5, 7.5];
-  const delays     = [0, 0.8, 1.4, 2.1, 0.4, 1.8];
-  const anim = floatAnims[floatIndex % 3];
-  const dur  = durations[floatIndex % durations.length];
-  const del  = delays[floatIndex % delays.length];
+  const ref = useRef(null);
+  const x = useMotionValue(0);
+  const y = useMotionValue(0);
+  const rotateX = useTransform(y, [-0.5, 0.5], [6, -6]);
+  const rotateY = useTransform(x, [-0.5, 0.5], [-6, 6]);
+  const springRotX = useSpring(rotateX, { stiffness: 300, damping: 30 });
+  const springRotY = useSpring(rotateY, { stiffness: 300, damping: 30 });
+
+  const handleMouseMove = useCallback((e) => {
+    if (!hover || !ref.current) return;
+    const rect = ref.current.getBoundingClientRect();
+    x.set((e.clientX - rect.left) / rect.width  - 0.5);
+    y.set((e.clientY - rect.top)  / rect.height - 0.5);
+  }, [hover, x, y]);
+
+  const handleMouseLeave = useCallback(() => {
+    x.set(0); y.set(0);
+  }, [x, y]);
 
   return (
-    <div
+    <motion.div
+      ref={ref}
       className={`finflow-card ${className}`}
       style={{
         background: 'var(--surface)',
         border: '1px solid var(--border)',
         borderRadius: 12,
         padding: '20px 22px',
-        animation: `springIn 0.45s ${floatIndex * 0.07}s cubic-bezier(.4,0,.2,1) both, ${anim} ${dur}s ${del}s ease-in-out infinite`,
-        transition: hover ? 'transform 0.22s cubic-bezier(.4,0,.2,1), box-shadow 0.22s, border-color 0.2s' : 'none',
-        cursor: 'default',
+        transformStyle: 'preserve-3d',
+        rotateX: hover ? springRotX : 0,
+        rotateY: hover ? springRotY : 0,
         ...style,
       }}
-      onMouseEnter={e => {
-        if (!hover) return;
-        e.currentTarget.style.transform = 'translateY(-8px) scale(1.012)';
-        e.currentTarget.style.boxShadow = '0 20px 48px rgba(0,0,0,0.5), 0 0 0 1px rgba(79,143,255,0.15)';
-        e.currentTarget.style.animationPlayState = 'paused';
-      }}
-      onMouseLeave={e => {
-        if (!hover) return;
-        e.currentTarget.style.transform = '';
-        e.currentTarget.style.boxShadow = '';
-        e.currentTarget.style.animationPlayState = 'running';
-      }}
+      initial={{ opacity: 0, y: 20, scale: 0.97 }}
+      animate={{ opacity: 1, y: 0,  scale: 1 }}
+      transition={{ delay: floatIndex * 0.07, duration: 0.45, ease: [0.4, 0, 0.2, 1] }}
+      whileHover={hover ? { boxShadow: '0 20px 48px rgba(0,0,0,0.5), 0 0 0 1px rgba(79,143,255,0.15)' } : {}}
+      onMouseMove={handleMouseMove}
+      onMouseLeave={handleMouseLeave}
       {...rest}
     >
       {children}
-    </div>
+    </motion.div>
   );
 }
 
@@ -51,22 +59,22 @@ export function Badge({ children, variant = 'cat' }) {
     paused:  { background: 'rgba(245,167,66,0.12)',  color: 'var(--amber)' },
   };
   return (
-    <span style={{
-      display: 'inline-flex', alignItems: 'center',
-      padding: '3px 9px', borderRadius: 20,
-      fontSize: 10, fontWeight: 500,
-      transition: 'transform 0.15s, filter 0.15s',
-      ...colors[variant],
-    }}
-      onMouseEnter={e => { e.currentTarget.style.transform = 'scale(1.08)'; e.currentTarget.style.filter = 'brightness(1.2)'; }}
-      onMouseLeave={e => { e.currentTarget.style.transform = ''; e.currentTarget.style.filter = ''; }}
+    <motion.span
+      style={{
+        display: 'inline-flex', alignItems: 'center',
+        padding: '3px 9px', borderRadius: 20,
+        fontSize: 10, fontWeight: 500,
+        ...colors[variant],
+      }}
+      whileHover={{ scale: 1.1, filter: 'brightness(1.2)' }}
+      transition={{ type: 'spring', stiffness: 400, damping: 20 }}
     >
       {children}
-    </span>
+    </motion.span>
   );
 }
 
-/* ── BUTTON ── */
+/* ── BUTTON with ripple ── */
 export function Btn({ children, onClick, variant = 'ghost', style, disabled }) {
   const base = {
     display: 'inline-flex', alignItems: 'center', gap: 6,
@@ -74,7 +82,6 @@ export function Btn({ children, onClick, variant = 'ghost', style, disabled }) {
     fontSize: 12, fontFamily: 'var(--font-sans)', fontWeight: 500,
     cursor: disabled ? 'not-allowed' : 'pointer',
     border: 'none', position: 'relative', overflow: 'hidden',
-    transition: 'all 0.18s cubic-bezier(.4,0,.2,1)',
     opacity: disabled ? 0.5 : 1,
   };
   const variants = {
@@ -86,14 +93,13 @@ export function Btn({ children, onClick, variant = 'ghost', style, disabled }) {
 
   const handleClick = (e) => {
     if (disabled) return;
-    // Ripple
-    const btn = e.currentTarget;
+    const btn  = e.currentTarget;
     const ripple = document.createElement('span');
-    const rect = btn.getBoundingClientRect();
-    const size = Math.max(rect.width, rect.height);
+    const rect   = btn.getBoundingClientRect();
+    const size   = Math.max(rect.width, rect.height);
     ripple.style.cssText = `position:absolute;border-radius:50%;background:rgba(255,255,255,0.25);
       width:${size}px;height:${size}px;
-      left:${e.clientX - rect.left - size/2}px;top:${e.clientY - rect.top - size/2}px;
+      left:${e.clientX - rect.left - size / 2}px;top:${e.clientY - rect.top - size / 2}px;
       transform:scale(0);animation:rippleAnim 0.5s linear;pointer-events:none;`;
     btn.appendChild(ripple);
     setTimeout(() => ripple.remove(), 500);
@@ -101,34 +107,24 @@ export function Btn({ children, onClick, variant = 'ghost', style, disabled }) {
   };
 
   return (
-    <button
+    <motion.button
       style={{ ...base, ...variants[variant], ...style }}
       onClick={handleClick}
       disabled={disabled}
-      onMouseEnter={e => {
-        if (disabled) return;
-        if (variant === 'primary') {
-          e.currentTarget.style.transform = 'translateY(-2px)';
-          e.currentTarget.style.boxShadow = '0 6px 20px rgba(79,143,255,0.4)';
-          e.currentTarget.style.background = '#6fa3ff';
-        } else {
-          e.currentTarget.style.background = 'rgba(255,255,255,0.08)';
-          e.currentTarget.style.color = 'var(--text)';
-        }
+      whileHover={disabled ? {} : {
+        y: variant === 'primary' ? -2 : 0,
+        boxShadow: variant === 'primary' ? '0 6px 20px rgba(79,143,255,0.4)' : 'none',
+        background: variant === 'primary' ? '#6fa3ff' : 'rgba(255,255,255,0.08)',
       }}
-      onMouseLeave={e => {
-        e.currentTarget.style.transform = '';
-        e.currentTarget.style.boxShadow = '';
-        e.currentTarget.style.background = variants[variant].background;
-        e.currentTarget.style.color = variants[variant].color;
-      }}
+      whileTap={disabled ? {} : { scale: 0.95 }}
+      transition={{ type: 'spring', stiffness: 400, damping: 20 }}
     >
       {children}
-    </button>
+    </motion.button>
   );
 }
 
-/* ── MODAL ── */
+/* ── SPRING MODAL ── */
 export function Modal({ open, onClose, title, children }) {
   useEffect(() => {
     const handler = (e) => { if (e.key === 'Escape') onClose(); };
@@ -136,18 +132,31 @@ export function Modal({ open, onClose, title, children }) {
     return () => document.removeEventListener('keydown', handler);
   }, [open, onClose]);
 
-  if (!open) return null;
   return (
-    <div
-      style={mStyles.overlay}
-      onClick={e => { if (e.target === e.currentTarget) onClose(); }}
-    >
-      <div style={mStyles.modal}>
-        <button style={mStyles.close} onClick={onClose}>✕</button>
-        <div style={mStyles.title}>{title}</div>
-        {children}
-      </div>
-    </div>
+    <AnimatePresence>
+      {open && (
+        <motion.div
+          style={mStyles.overlay}
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          exit={{ opacity: 0 }}
+          transition={{ duration: 0.2 }}
+          onClick={e => { if (e.target === e.currentTarget) onClose(); }}
+        >
+          <motion.div
+            style={mStyles.modal}
+            initial={{ opacity: 0, scale: 0.88, y: 24 }}
+            animate={{ opacity: 1, scale: 1,    y: 0  }}
+            exit={{   opacity: 0, scale: 0.92,  y: 16 }}
+            transition={{ type: 'spring', stiffness: 380, damping: 28 }}
+          >
+            <button style={mStyles.close} onClick={onClose}>✕</button>
+            <div style={mStyles.title}>{title}</div>
+            {children}
+          </motion.div>
+        </motion.div>
+      )}
+    </AnimatePresence>
   );
 }
 
@@ -157,7 +166,7 @@ const mStyles = {
     background: 'rgba(0,0,0,0.75)',
     zIndex: 100,
     display: 'flex', alignItems: 'center', justifyContent: 'center',
-    animation: 'overlayIn 0.2s ease both',
+    backdropFilter: 'blur(4px)',
   },
   modal: {
     background: 'var(--surface)',
@@ -165,7 +174,6 @@ const mStyles = {
     borderRadius: 16, padding: 28,
     width: 420, maxWidth: '90vw',
     position: 'relative',
-    animation: 'modalPop 0.28s cubic-bezier(0.34, 1.56, 0.64, 1) both',
   },
   title: { fontSize: 16, fontWeight: 600, marginBottom: 20, color: 'var(--text)' },
   close: {
@@ -230,35 +238,89 @@ export function Select({ style, children, ...props }) {
   );
 }
 
+/* ── NUMBER SCRAMBLE ── */
+const CHARS = '0123456789';
+export function ScrambleNumber({ value, prefix = '', suffix = '', decimals = 0, duration = 900 }) {
+  const [display, setDisplay] = useState('0');
+  const frameRef = useRef(null);
+
+  useEffect(() => {
+    const target  = Number(value);
+    const start   = performance.now();
+    let iteration = 0;
+
+    const animate = (now) => {
+      const elapsed  = now - start;
+      const progress = Math.min(elapsed / duration, 1);
+      const eased    = 1 - Math.pow(1 - progress, 3);
+      const current  = (target * eased).toFixed(decimals);
+      const chars    = current.toString().split('');
+
+      // Scramble unrevealed digits
+      const scrambled = chars.map((ch, i) => {
+        if (ch === '.' || ch === ',') return ch;
+        if (i < Math.floor(chars.length * eased)) return ch;
+        return CHARS[Math.floor(Math.random() * 10)];
+      }).join('');
+
+      setDisplay(scrambled);
+      if (progress < 1) frameRef.current = requestAnimationFrame(animate);
+      else setDisplay(target.toLocaleString('en-IN', { minimumFractionDigits: decimals }));
+    };
+
+    frameRef.current = requestAnimationFrame(animate);
+    return () => cancelAnimationFrame(frameRef.current);
+  }, [value, duration, decimals]);
+
+  return <span style={{ fontFamily: 'var(--font-mono)' }}>{prefix}{display}{suffix}</span>;
+}
+
 /* ── TOAST ── */
 export function Toast({ message, visible }) {
   return (
-    <div style={{
-      position: 'fixed', bottom: 24, right: 24,
-      background: 'var(--surface2)',
-      border: '1px solid var(--border2)',
-      borderRadius: 10, padding: '12px 18px',
-      fontSize: 13, color: 'var(--text)',
-      zIndex: 200,
-      display: 'flex', alignItems: 'center', gap: 8,
-      pointerEvents: 'none',
-      opacity: visible ? 1 : 0,
-      transform: visible ? 'translateY(0) scale(1)' : 'translateY(80px) scale(0.9)',
-      transition: 'all 0.35s cubic-bezier(.4,0,.2,1)',
-      animation: visible ? 'toastBounce 0.45s cubic-bezier(.4,0,.2,1) both' : 'none',
-    }}>
-      {message}
-    </div>
+    <AnimatePresence>
+      {visible && (
+        <motion.div
+          style={{
+            position: 'fixed', bottom: 24, right: 24,
+            background: 'var(--surface2)',
+            border: '1px solid var(--border2)',
+            borderRadius: 10, padding: '12px 18px',
+            fontSize: 13, color: 'var(--text)',
+            zIndex: 200,
+            display: 'flex', alignItems: 'center', gap: 8,
+            pointerEvents: 'none',
+          }}
+          initial={{ opacity: 0, y: 40, scale: 0.9 }}
+          animate={{ opacity: 1, y: 0,  scale: 1   }}
+          exit={{   opacity: 0, y: 20,  scale: 0.95 }}
+          transition={{ type: 'spring', stiffness: 380, damping: 26 }}
+        >
+          {message}
+        </motion.div>
+      )}
+    </AnimatePresence>
   );
 }
 
 /* ── EMPTY STATE ── */
 export function EmptyState({ icon = '🔍', title, sub }) {
   return (
-    <div style={{ textAlign: 'center', padding: '48px 20px', color: 'var(--muted)', animation: 'fadeUp 0.4s both' }}>
-      <div style={{ fontSize: 36, marginBottom: 12 }}>{icon}</div>
+    <motion.div
+      style={{ textAlign: 'center', padding: '48px 20px', color: 'var(--muted)' }}
+      initial={{ opacity: 0, y: 10 }}
+      animate={{ opacity: 1, y: 0  }}
+      transition={{ duration: 0.35 }}
+    >
+      <motion.div
+        style={{ fontSize: 36, marginBottom: 12 }}
+        animate={{ y: [0, -6, 0] }}
+        transition={{ duration: 2.5, repeat: Infinity, ease: 'easeInOut' }}
+      >
+        {icon}
+      </motion.div>
       {title && <div style={{ fontSize: 14, color: 'var(--text)', fontWeight: 500, marginBottom: 6 }}>{title}</div>}
       <div style={{ fontSize: 12 }}>{sub}</div>
-    </div>
+    </motion.div>
   );
 }
