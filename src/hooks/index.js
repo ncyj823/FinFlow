@@ -1,5 +1,6 @@
 import { useState, useEffect, useCallback } from 'react';
 import { INITIAL_TRANSACTIONS, INITIAL_BUDGETS, INITIAL_RECURRING } from '../data/mockData';
+import { setLastAddedId } from '../store/uiStore';
 
 // ── useLocalStorage ──
 export function useLocalStorage(key, initialValue) {
@@ -24,7 +25,9 @@ export function useTransactions() {
   const [transactions, setTransactions] = useLocalStorage('finflow_tx', INITIAL_TRANSACTIONS);
 
   const addTransaction = useCallback((tx) => {
-    setTransactions(prev => [{ ...tx, id: Date.now() }, ...prev]);
+    const newId = Date.now();
+    setTransactions(prev => [{ ...tx, id: newId }, ...prev]);
+    setLastAddedId(newId);
   }, [setTransactions]);
 
   const updateTransaction = useCallback((id, updates) => {

@@ -165,7 +165,7 @@ const mStyles = {
     borderRadius: 16, padding: 28,
     width: 420, maxWidth: '90vw',
     position: 'relative',
-    animation: 'modalPop 0.35s cubic-bezier(.4,0,.2,1) both',
+    animation: 'modalPop 0.28s cubic-bezier(0.34, 1.56, 0.64, 1) both',
   },
   title: { fontSize: 16, fontWeight: 600, marginBottom: 20, color: 'var(--text)' },
   close: {

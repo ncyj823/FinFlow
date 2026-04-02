@@ -1,9 +1,15 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { Bar } from 'react-chartjs-2';
 import { Card } from './UI';
 import { CAT_COLORS } from '../data/mockData';
 
 export default function Insights({ transactions }) {
+  const [mounted, setMounted] = useState(false);
+
+  useEffect(() => {
+    const timer = setTimeout(() => setMounted(true), 100);
+    return () => clearTimeout(timer);
+  }, []);
   const expenses    = transactions.filter(t => t.type === 'expense');
   const income      = transactions.filter(t => t.type === 'income');
   const totalExp    = expenses.reduce((a, t) => a + t.amount, 0);
@@ -79,10 +85,9 @@ export default function Insights({ transactions }) {
               <div style={{
                 height: '100%', borderRadius: 3,
                 background: CAT_COLORS[cat] || '#7b82a0',
-                width: `${(amt / maxCat * 100).toFixed(1)}%`,
-                animation: 'progressSweep 0.8s cubic-bezier(.4,0,.2,1) both',
-                animationDelay: `${i * 0.08}s`,
-                transition: 'width 0.6s cubic-bezier(.4,0,.2,1)',
+                width: mounted ? `${(amt / maxCat * 100).toFixed(1)}%` : '0%',
+                transition: 'width 900ms cubic-bezier(0.4, 0, 0.2, 1)',
+                transitionDelay: `${i * 80}ms`,
               }} />
             </div>
             <div style={{ fontSize: 11, color: 'var(--muted)', width: 50, textAlign: 'right', fontFamily: 'var(--font-mono)' }}>${amt.toFixed(0)}</div>

@@ -88,7 +88,7 @@ export default function App() {
 
         {/* Content */}
         <div style={{ flex: 1, overflowY: 'auto', padding: 28, scrollBehavior: 'smooth' }}>
-          <div key={page} style={{ animation: 'springIn 0.38s cubic-bezier(.4,0,.2,1) both' }}>
+          <div key={page} style={{ animation: 'pageTransition 0.22s ease both' }}>
             {page === 'dashboard'    && <Dashboard   transactions={transactions} />}
             {page === 'transactions' && <Transactions transactions={transactions} role={role} onAdd={addTransaction} onUpdate={updateTransaction} onDelete={deleteTransaction} onToast={showToast} />}
             {page === 'insights'     && <Insights    transactions={transactions} />}

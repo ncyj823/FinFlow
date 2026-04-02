@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { Card, Badge, Btn, Modal, Field, Input, Select, EmptyState } from './UI';
 import { CATEGORIES, EXPENSE_CATS } from '../data/mockData';
+import { useUIStore } from '../store/uiStore';
 
 function TxModal({ open, onClose, onSave, editing }) {
   const [desc, setDesc]   = useState(editing?.desc || '');
@@ -61,6 +62,7 @@ export default function Transactions({ transactions, role, onAdd, onUpdate, onDe
   const [sort, setSort]         = useState('date-desc');
   const [modalOpen, setModal]   = useState(false);
   const [editing, setEditing]   = useState(null);
+  const { lastAddedId }         = useUIStore();
 
   const filtered = transactions
     .filter(t => {
@@ -138,6 +140,7 @@ export default function Transactions({ transactions, role, onAdd, onUpdate, onDe
               <tbody>
                 {filtered.map((t, i) => (
                   <tr key={t.id}
+                    className={t.id === lastAddedId ? 'tx-row-flash' : ''}
                     style={{ borderBottom: '1px solid var(--border)', animation: `fadeUp 0.3s ${i * 0.03}s both`, transition: 'background 0.15s, transform 0.15s' }}
                     onMouseEnter={e => { e.currentTarget.style.background = 'rgba(79,143,255,0.03)'; e.currentTarget.style.transform = 'translateX(2px)'; }}
                     onMouseLeave={e => { e.currentTarget.style.background = ''; e.currentTarget.style.transform = ''; }}
