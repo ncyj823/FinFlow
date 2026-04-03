@@ -9,7 +9,7 @@ const NAV_ITEMS = [
   { id: 'ai-insights',  icon: '✦', label: 'AI Insights' },
 ];
 
-export default function Sidebar({ active, onNavigate, role, onRoleChange }) {
+export default function Sidebar({ active, onNavigate, role, onRoleChange, sidebarOpen }) {
   const [activeIndex, setActiveIndex] = useState(0);
   const [yOffset, setYOffset] = useState(0);
   const [roleBadgeKey, setRoleBadgeKey] = useState(0);
@@ -38,7 +38,7 @@ export default function Sidebar({ active, onNavigate, role, onRoleChange }) {
   };
 
   return (
-    <aside style={styles.sidebar}>
+    <aside style={styles.sidebar} className={`finflow-sidebar ${sidebarOpen ? 'open' : ''}`}>
       {/* Logo */}
       <div style={styles.logo}>
         <div style={styles.logoMark}>F</div>

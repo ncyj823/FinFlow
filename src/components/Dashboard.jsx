@@ -34,10 +34,10 @@ function SummaryCard({ label, value, prefix = '', suffix = '', color, accentColo
 
   return (
     <Card floatIndex={delay} className="summary-card" data-index={delay} style={{ borderTop: `2px solid ${accentColor}` }}>
-      <div style={{ fontSize: 11, letterSpacing: '0.5px', textTransform: 'uppercase', color: 'var(--muted)', marginBottom: 8 }}>
+      <div className="summary-card-label" style={{ fontSize: 11, letterSpacing: '0.5px', textTransform: 'uppercase', color: 'var(--muted)', marginBottom: 8 }}>
         {label}
       </div>
-      <div style={{ fontSize: 26, fontWeight: 600, fontFamily: 'var(--font-mono)', letterSpacing: '-1px', color, animation: 'countUp 0.5s 0.3s both' }}>
+      <div className="summary-card-value" style={{ fontSize: 26, fontWeight: 600, fontFamily: 'var(--font-mono)', letterSpacing: '-1px', color, animation: 'countUp 0.5s 0.3s both' }}>
         {display}
       </div>
       <div style={{ fontSize: 11, marginTop: 6, color: changeUp ? 'var(--green)' : 'var(--red)', display: 'flex', alignItems: 'center', gap: 4 }}>
@@ -77,7 +77,7 @@ export default function Dashboard({ transactions }) {
   return (
     <div>
       {/* Summary Cards */}
-      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4,1fr)', gap: 16, marginBottom: 24 }}>
+      <div className="dashboard-summary-grid" style={{ display: 'grid', gridTemplateColumns: 'repeat(4,1fr)', gap: 16, marginBottom: 24 }}>
         <SummaryCard label="Total Balance"  value={24381} prefix="₹" color="var(--accent)" accentColor="var(--accent)" change="8.2% vs last month"  changeUp delay={0} />
         <SummaryCard label="Income (Apr)"   value={8450}  prefix="₹" color="var(--green)"  accentColor="var(--green)"  change="12.4% vs Mar"         changeUp delay={1} />
         <SummaryCard label="Expenses (Apr)" value={3820}  prefix="₹" color="var(--red)"    accentColor="var(--red)"    change="5.1% vs Mar"           changeUp={false} delay={2} />
@@ -85,9 +85,9 @@ export default function Dashboard({ transactions }) {
       </div>
 
       {/* Charts Row */}
-      <div style={{ display: 'grid', gridTemplateColumns: '2fr 1fr', gap: 16, marginBottom: 24 }}>
+      <div className="charts-grid" style={{ display: 'grid', gridTemplateColumns: '2fr 1fr', gap: 16, marginBottom: 24 }}>
         <Card floatIndex={4} hover={false}>
-          <div style={s.chartHeader}>
+          <div className="chart-header" style={s.chartHeader}>
             <div>
               <div style={s.chartTitle}>Balance Trend</div>
               <div style={s.chartSub}>Running balance over time</div>
@@ -118,7 +118,7 @@ export default function Dashboard({ transactions }) {
         </Card>
 
         <Card floatIndex={5} hover={false}>
-          <div style={s.chartHeader}>
+          <div className="chart-header" style={s.chartHeader}>
             <div>
               <div style={s.chartTitle}>Spending by Category</div>
               <div style={s.chartSub}>Current month</div>
@@ -141,31 +141,33 @@ export default function Dashboard({ transactions }) {
 
       {/* Recent Transactions */}
       <Card floatIndex={6} hover={false}>
-        <div style={{ ...s.chartHeader, marginBottom: 16 }}>
+        <div className="chart-header" style={{ ...s.chartHeader, marginBottom: 16 }}>
           <div style={s.chartTitle}>Recent Transactions</div>
         </div>
-        <table style={{ width: '100%', borderCollapse: 'collapse' }}>
-          <thead>
-            <tr>
-              {['Date','Description','Category','Type','Amount'].map(h => (
-                <th key={h} style={s.th}>{h}</th>
-              ))}
-            </tr>
-          </thead>
-          <tbody>
-            {recent.map((t, i) => (
-              <tr key={t.id} style={{ animation: `fadeUp 0.3s ${i * 0.05}s both`, borderBottom: '1px solid var(--border)' }}>
-                <td style={{ ...s.td, color: 'var(--muted)', fontFamily: 'var(--font-mono)', fontSize: 11 }}>{t.date}</td>
-                <td style={{ ...s.td, fontWeight: 500 }}>{t.desc}</td>
-                <td style={s.td}><Badge variant="cat">{t.cat}</Badge></td>
-                <td style={s.td}><Badge variant={t.type}>{t.type}</Badge></td>
-                <td style={{ ...s.td, textAlign: 'right', fontFamily: 'var(--font-mono)', color: t.type === 'income' ? 'var(--green)' : 'var(--red)' }}>
-                  {t.type === 'income' ? '+' : '-'}${t.amount.toFixed(2)}
-                </td>
+        <div className="transactions-table-wrapper">
+          <table style={{ width: '100%', borderCollapse: 'collapse' }}>
+            <thead>
+              <tr>
+                {['Date','Description','Category','Type','Amount'].map(h => (
+                  <th key={h} style={s.th}>{h}</th>
+                ))}
               </tr>
-            ))}
-          </tbody>
-        </table>
+            </thead>
+            <tbody>
+              {recent.map((t, i) => (
+                <tr key={t.id} style={{ animation: `fadeUp 0.3s ${i * 0.05}s both`, borderBottom: '1px solid var(--border)' }}>
+                  <td style={{ ...s.td, color: 'var(--muted)', fontFamily: 'var(--font-mono)', fontSize: 11 }}>{t.date}</td>
+                  <td style={{ ...s.td, fontWeight: 500 }}>{t.desc}</td>
+                  <td style={s.td}><Badge variant="cat">{t.cat}</Badge></td>
+                  <td style={s.td}><Badge variant={t.type}>{t.type}</Badge></td>
+                  <td style={{ ...s.td, textAlign: 'right', fontFamily: 'var(--font-mono)', color: t.type === 'income' ? 'var(--green)' : 'var(--red)' }}>
+                    {t.type === 'income' ? '+' : '-'}${t.amount.toFixed(2)}
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
       </Card>
     </div>
   );

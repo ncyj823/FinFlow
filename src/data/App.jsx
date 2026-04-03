@@ -23,6 +23,7 @@ export default function App() {
   const [role, setRole]       = useState('admin');
   const [toast, setToast]     = useState({ msg: '', visible: false });
   const [toastTimer, setTimer] = useState(null);
+  const [sidebarOpen, setSidebarOpen] = useState(false);
 
   const { transactions, addTransaction, updateTransaction, deleteTransaction } = useTransactions();
   const { budgets, addBudget, deleteBudget }                                   = useBudgets();
@@ -54,40 +55,111 @@ export default function App() {
 
   return (
     <div style={{ display: 'flex', minHeight: '100vh' }}>
-      <Sidebar active={page} onNavigate={setPage} role={role} onRoleChange={handleRoleChange} />
+      {/* Dark Overlay for Mobile */}
+      {sidebarOpen && (
+        <div
+          onClick={() => setSidebarOpen(false)}
+          style={{
+            position: 'fixed',
+            top: 0,
+            left: 0,
+            right: 0,
+            bottom: 0,
+            background: 'rgba(0,0,0,0.6)',
+            zIndex: 39,
+            animation: 'overlayIn 0.2s ease-out',
+          }}
+        />
+      )}
+
+      <Sidebar active={page} onNavigate={(id) => { setPage(id); setSidebarOpen(false); }} role={role} onRoleChange={handleRoleChange} sidebarOpen={sidebarOpen} />
 
       <div style={{ flex: 1, display: 'flex', flexDirection: 'column', overflow: 'hidden' }}>
         {/* Topbar */}
-        <div style={{
+        <div className="topbar" style={{
           background: 'var(--surface)', borderBottom: '1px solid var(--border)',
           padding: '16px 28px', display: 'flex', alignItems: 'center', justifyContent: 'space-between',
           position: 'sticky', top: 0, zIndex: 10,
           animation: 'fadeUp 0.4s cubic-bezier(.4,0,.2,1) both',
         }}>
-          <div>
-            <div style={{ fontSize: 18, fontWeight: 600, letterSpacing: '-0.4px' }}>{meta.title}</div>
-            <div style={{ fontSize: 12, color: 'var(--muted)', marginTop: 1 }}>{meta.sub}</div>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 12, flex: 1 }}>
+            <button
+              onClick={() => setSidebarOpen(!sidebarOpen)}
+              className="hamburger-btn"
+              style={{
+                display: 'none',
+                background: 'none',
+                border: 'none',
+                color: 'var(--text)',
+                fontSize: 20,
+                cursor: 'pointer',
+                padding: 4,
+              }}
+            >
+              ☰
+            </button>
+            <div>
+              <div className="topbar-title" style={{ fontSize: 18, fontWeight: 600, letterSpacing: '-0.4px' }}>{meta.title}</div>
+              <div className="topbar-subtitle" style={{ fontSize: 12, color: 'var(--muted)', marginTop: 1 }}>{meta.sub}</div>
+            </div>
           </div>
-          <div style={{ display: 'flex', gap: 10 }}>
+          <div style={{ display: 'flex', gap: 10, alignItems: 'center' }}>
             <button
               onClick={exportCSV}
+              className="export-btn-text"
               style={btnStyle}
               onMouseEnter={e => { e.currentTarget.style.color = 'var(--text)'; e.currentTarget.style.background = 'rgba(255,255,255,0.08)'; }}
               onMouseLeave={e => { e.currentTarget.style.color = 'var(--muted)'; e.currentTarget.style.background = 'rgba(255,255,255,0.05)'; }}
             >↓ Export</button>
+            <button
+              onClick={exportCSV}
+              className="export-btn-icon"
+              style={{
+                display: 'none',
+                background: 'none',
+                border: 'none',
+                color: 'var(--text)',
+                fontSize: 16,
+                cursor: 'pointer',
+                padding: 6,
+              }}
+            >
+              ↓
+            </button>
             {role === 'admin' && (
-              <button
-                onClick={() => setPage('transactions')}
-                style={{ ...btnStyle, background: 'var(--accent)', color: '#fff', border: 'none' }}
-                onMouseEnter={e => { e.currentTarget.style.background = '#6fa3ff'; e.currentTarget.style.transform = 'translateY(-1px)'; e.currentTarget.style.boxShadow = '0 4px 16px rgba(79,143,255,0.4)'; }}
-                onMouseLeave={e => { e.currentTarget.style.background = 'var(--accent)'; e.currentTarget.style.transform = ''; e.currentTarget.style.boxShadow = ''; }}
-              >+ Add Transaction</button>
+              <>
+                <button
+                  onClick={() => setPage('transactions')}
+                  className="add-tx-btn-text"
+                  style={{ ...btnStyle, background: 'var(--accent)', color: '#fff', border: 'none' }}
+                  onMouseEnter={e => { e.currentTarget.style.background = '#6fa3ff'; e.currentTarget.style.transform = 'translateY(-1px)'; e.currentTarget.style.boxShadow = '0 4px 16px rgba(79,143,255,0.4)'; }}
+                  onMouseLeave={e => { e.currentTarget.style.background = 'var(--accent)'; e.currentTarget.style.transform = ''; e.currentTarget.style.boxShadow = ''; }}
+                >+ Add Transaction</button>
+                <button
+                  onClick={() => setPage('transactions')}
+                  className="add-tx-btn-icon"
+                  style={{
+                    display: 'none',
+                    background: 'var(--accent)',
+                    color: '#fff',
+                    border: 'none',
+                    borderRadius: 8,
+                    width: 36,
+                    height: 36,
+                    fontSize: 18,
+                    cursor: 'pointer',
+                    fontWeight: 600,
+                  }}
+                  onMouseEnter={e => { e.currentTarget.style.background = '#6fa3ff'; e.currentTarget.style.transform = 'translateY(-1px)'; e.currentTarget.style.boxShadow = '0 4px 16px rgba(79,143,255,0.4)'; }}
+                  onMouseLeave={e => { e.currentTarget.style.background = 'var(--accent)'; e.currentTarget.style.transform = ''; e.currentTarget.style.boxShadow = ''; }}
+                >+</button>
+              </>
             )}
           </div>
         </div>
 
         {/* Content */}
-        <div style={{ flex: 1, overflowY: 'auto', padding: 28, scrollBehavior: 'smooth' }}>
+        <div className="content-area" style={{ flex: 1, overflowY: 'auto', padding: 28, scrollBehavior: 'smooth' }}>
           <div key={page} style={{ animation: 'pageTransition 0.22s ease both' }}>
             {page === 'dashboard'    && <Dashboard   transactions={transactions} />}
             {page === 'transactions' && <Transactions transactions={transactions} role={role} onAdd={addTransaction} onUpdate={updateTransaction} onDelete={deleteTransaction} onToast={showToast} />}
