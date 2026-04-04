@@ -27,8 +27,9 @@ export function Card({ children, style, floatIndex = 0, hover = true, className 
       ref={ref}
       className={`finflow-card ${className}`}
       style={{
-        background: 'var(--surface)',
-        border: '1px solid var(--border)',
+        background: 'rgba(15, 21, 37, 0.4)',
+        backdropFilter: 'blur(12px)',
+        border: '1px solid rgba(255, 255, 255, 0.08)',
         borderRadius: 12,
         padding: '20px 22px',
         transformStyle: 'preserve-3d',
@@ -39,7 +40,7 @@ export function Card({ children, style, floatIndex = 0, hover = true, className 
       initial={{ opacity: 0, y: 20, scale: 0.97 }}
       animate={{ opacity: 1, y: 0,  scale: 1 }}
       transition={{ delay: floatIndex * 0.07, duration: 0.45, ease: [0.4, 0, 0.2, 1] }}
-      whileHover={hover ? { boxShadow: '0 20px 48px rgba(0,0,0,0.5), 0 0 0 1px rgba(79,143,255,0.15)' } : {}}
+      whileHover={hover ? { boxShadow: '0 20px 48px rgba(79,143,255,0.1), 0 0 0 1px rgba(79,143,255,0.15)' } : {}}
       onMouseMove={handleMouseMove}
       onMouseLeave={handleMouseLeave}
       {...rest}
@@ -163,17 +164,18 @@ export function Modal({ open, onClose, title, children }) {
 const mStyles = {
   overlay: {
     position: 'fixed', inset: 0,
-    background: 'rgba(0,0,0,0.75)',
+    background: 'rgba(0,0,0,0.6)',
     zIndex: 100,
     display: 'flex', alignItems: 'center', justifyContent: 'center',
-    backdropFilter: 'blur(4px)',
+    backdropFilter: 'blur(8px)',
   },
   modal: {
-    background: 'var(--surface)',
-    border: '1px solid var(--border2)',
+    background: 'rgba(15, 21, 37, 0.7)',
+    border: '1px solid rgba(255, 255, 255, 0.1)',
     borderRadius: 16, padding: 28,
     width: 420, maxWidth: '90vw',
     position: 'relative',
+    backdropFilter: 'blur(12px)',
   },
   title: { fontSize: 16, fontWeight: 600, marginBottom: 20, color: 'var(--text)' },
   close: {
@@ -204,15 +206,16 @@ export function Input({ style, ...props }) {
   return (
     <input
       style={{
-        width: '100%', background: 'var(--surface2)',
-        border: '1px solid var(--border2)', borderRadius: 8,
+        width: '100%', background: 'rgba(22, 29, 48, 0.5)',
+        border: '1px solid rgba(255, 255, 255, 0.1)', borderRadius: 8,
         color: 'var(--text)', padding: '9px 12px',
         fontSize: 13, fontFamily: 'var(--font-sans)', outline: 'none',
-        transition: 'border-color 0.2s, box-shadow 0.2s',
+        transition: 'all 0.2s',
+        backdropFilter: 'blur(4px)',
         ...style,
       }}
-      onFocus={e => { e.target.style.borderColor = 'var(--accent)'; e.target.style.boxShadow = '0 0 0 3px rgba(79,143,255,0.15)'; }}
-      onBlur={e =>  { e.target.style.borderColor = 'var(--border2)'; e.target.style.boxShadow = ''; }}
+      onFocus={e => { e.target.style.borderColor = 'rgba(79, 143, 255, 0.3)'; e.target.style.boxShadow = '0 0 0 3px rgba(79,143,255,0.1)'; e.target.style.backdropFilter = 'blur(8px)'; }}
+      onBlur={e =>  { e.target.style.borderColor = 'rgba(255, 255, 255, 0.1)'; e.target.style.boxShadow = ''; e.target.style.backdropFilter = 'blur(4px)'; }}
       {...props}
     />
   );
@@ -222,15 +225,16 @@ export function Select({ style, children, ...props }) {
   return (
     <select
       style={{
-        width: '100%', background: 'var(--surface2)',
-        border: '1px solid var(--border2)', borderRadius: 8,
+        width: '100%', background: 'rgba(22, 29, 48, 0.5)',
+        border: '1px solid rgba(255, 255, 255, 0.1)', borderRadius: 8,
         color: 'var(--text)', padding: '9px 12px',
         fontSize: 13, fontFamily: 'var(--font-sans)', outline: 'none',
-        cursor: 'pointer', transition: 'border-color 0.2s',
+        cursor: 'pointer', transition: 'all 0.2s',
+        backdropFilter: 'blur(4px)',
         ...style,
       }}
-      onFocus={e => { e.target.style.borderColor = 'var(--accent)'; }}
-      onBlur={e =>  { e.target.style.borderColor = 'var(--border2)'; }}
+      onFocus={e => { e.target.style.borderColor = 'rgba(79, 143, 255, 0.3)'; e.target.style.backdropFilter = 'blur(8px)'; }}
+      onBlur={e =>  { e.target.style.borderColor = 'rgba(255, 255, 255, 0.1)'; e.target.style.backdropFilter = 'blur(4px)'; }}
       {...props}
     >
       {children}
@@ -283,13 +287,14 @@ export function Toast({ message, visible }) {
         <motion.div
           style={{
             position: 'fixed', bottom: 24, right: 24,
-            background: 'var(--surface2)',
-            border: '1px solid var(--border2)',
+            background: 'rgba(15, 21, 37, 0.6)',
+            border: '1px solid rgba(255, 255, 255, 0.1)',
             borderRadius: 10, padding: '12px 18px',
             fontSize: 13, color: 'var(--text)',
             zIndex: 200,
             display: 'flex', alignItems: 'center', gap: 8,
             pointerEvents: 'none',
+            backdropFilter: 'blur(12px)',
           }}
           initial={{ opacity: 0, y: 40, scale: 0.9 }}
           animate={{ opacity: 1, y: 0,  scale: 1   }}

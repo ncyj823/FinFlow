@@ -15,8 +15,10 @@ const CHART_OPTS = {
   plugins: {
     legend: { display: false },
     tooltip: {
-      backgroundColor: '#1a2035', titleColor: '#e8eaf2',
-      bodyColor: '#7b82a0', borderColor: 'rgba(255,255,255,0.1)', borderWidth: 1,
+      backgroundColor: 'rgba(15, 21, 37, 0.8)', titleColor: '#e8eaf2',
+      bodyColor: '#7b82a0', borderColor: 'rgba(255,255,255,0.15)', borderWidth: 1,
+      backdropFilter: 'blur(8px)',
+      padding: 10,
     },
   },
 };
@@ -33,11 +35,11 @@ function SummaryCard({ label, value, prefix = '', suffix = '', color, accentColo
   }
 
   return (
-    <Card floatIndex={delay} className="summary-card" data-index={delay} style={{ borderTop: `2px solid ${accentColor}` }}>
+    <Card floatIndex={delay} className="summary-card" data-index={delay} style={{ borderLeft: `4px solid ${accentColor}` }}>
       <div className="summary-card-label" style={{ fontSize: 11, letterSpacing: '0.5px', textTransform: 'uppercase', color: 'var(--muted)', marginBottom: 8 }}>
         {label}
       </div>
-      <div className="summary-card-value" style={{ fontSize: 26, fontWeight: 600, fontFamily: 'var(--font-mono)', letterSpacing: '-1px', color, animation: 'countUp 0.5s 0.3s both' }}>
+      <div className="summary-card-value" style={{ fontSize: 28, fontWeight: 700, fontFamily: "var(--font-display), 'Space Mono', monospace", letterSpacing: '-1.5px', color, animation: 'countUp 0.5s 0.3s both' }}>
         {display}
       </div>
       <div style={{ fontSize: 11, marginTop: 6, color: changeUp ? 'var(--green)' : 'var(--red)', display: 'flex', alignItems: 'center', gap: 4 }}>
@@ -69,7 +71,7 @@ export default function Dashboard({ transactions }) {
 
   const donutData = {
     labels: catLabels,
-    datasets: [{ data: catVals, backgroundColor: catColors, borderColor: '#0f1320', borderWidth: 2, hoverOffset: 6 }],
+    datasets: [{ data: catVals, backgroundColor: catColors, borderColor: '#0f1525', borderWidth: 2, hoverOffset: 6 }],
   };
 
   const recent = [...transactions].sort((a, b) => b.date.localeCompare(a.date)).slice(0, 5);

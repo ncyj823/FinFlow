@@ -121,8 +121,9 @@ export default function Sidebar({ active, onNavigate, role, onRoleChange, sideba
 const styles = {
   sidebar: {
     width: 220, minWidth: 220,
-    background: 'var(--surface)',
-    borderRight: '1px solid var(--border)',
+    background: 'rgba(15, 21, 37, 0.5)',
+    backdropFilter: 'blur(12px)',
+    borderRight: '1px solid rgba(255, 255, 255, 0.08)',
     display: 'flex', flexDirection: 'column',
     position: 'sticky', top: 0, height: '100vh',
     overflowY: 'auto',
@@ -130,7 +131,7 @@ const styles = {
   },
   logo: {
     padding: '24px 20px 20px',
-    borderBottom: '1px solid var(--border)',
+    borderBottom: '1px solid rgba(255, 255, 255, 0.08)',
     display: 'flex', alignItems: 'center', gap: 10,
     animation: 'logoFadeIn 0.4s cubic-bezier(0.4, 0, 0.2, 1) 0.15s both',
   },
@@ -171,7 +172,7 @@ const styles = {
 
   roleSection: {
     padding: 16,
-    borderTop: '1px solid var(--border)',
+    borderTop: '1px solid rgba(255, 255, 255, 0.08)',
     animation: 'roleSectionFadeIn 0.4s cubic-bezier(0.4, 0, 0.2, 1) 0.5s both',
   },
   roleLabel: {
@@ -180,8 +181,9 @@ const styles = {
   },
   roleSelect: {
     width: '100%',
-    background: 'var(--surface2)',
-    border: '1px solid var(--border2)',
+    background: 'rgba(22, 29, 48, 0.5)',
+    backdropFilter: 'blur(8px)',
+    border: '1px solid rgba(255, 255, 255, 0.1)',
     borderRadius: 8,
     color: 'var(--text)',
     padding: '8px 10px',
@@ -189,7 +191,7 @@ const styles = {
     fontFamily: 'var(--font-sans)',
     cursor: 'pointer',
     outline: 'none',
-    transition: 'border-color 0.2s',
+    transition: 'all 0.2s',
   },
   roleBadge: {
     display: 'inline-flex', alignItems: 'center', gap: 5,
