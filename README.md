@@ -26,7 +26,7 @@ npm start
 npm run build
 ```
 
-Opens at **https://fin-flow-teal-one.vercel.app/**
+Opens at **https://fin-flow-f1ez.vercel.app/**
 
 ---
 
