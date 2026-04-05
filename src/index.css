@@ -1,5 +1,12 @@
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    transition-duration: 0.01ms !important;
+  }
+}
+
 :root {
   --bg: #080c18;
   --surface: #0f1525;
@@ -85,6 +92,9 @@ body::after {
 @keyframes orbitSpin {
   from { transform: rotate(0deg); }
   to   { transform: rotate(360deg); }
+}
+@keyframes spin {
+  to { transform: rotate(360deg); }
 }
 @keyframes floatBadge {
   0%, 100% { transform: translateY(0) translateX(0); }
@@ -204,7 +214,6 @@ input:focus, textarea:focus, select:focus {
   border-color: rgba(79, 143, 255, 0.3);
   box-shadow: 0 0 0 3px rgba(79, 143, 255, 0.1);
   outline: none;
-  backdrop-filter: blur(8px);
 }
 
 /* ── STAGGERED CARD ENTRANCE ── */
@@ -252,7 +261,6 @@ table th {
   border-right: 1px solid rgba(157, 181, 255, 0.16);
   border-bottom: 1px solid rgba(157, 181, 255, 0.12);
   background: linear-gradient(150deg, rgba(22, 29, 48, 0.64), rgba(15, 21, 37, 0.45));
-  backdrop-filter: blur(12px);
   transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
@@ -359,10 +367,22 @@ table th {
 }
 
 .finflow-sidebar {
-  background: linear-gradient(180deg, rgba(15, 21, 37, 0.62), rgba(15, 21, 37, 0.45)) !important;
-  backdrop-filter: blur(12px) saturate(128%) !important;
+  background: rgba(15, 21, 37, 0.96) !important;
   border-right: 1px solid rgba(163, 188, 255, 0.2) !important;
   box-shadow: 0 0 0 1px rgba(255, 255, 255, 0.04) inset;
+}
+
+.finflow-card {
+  will-change: transform;
+  transform: translateZ(0);
+}
+
+.finflow-card:hover {
+  animation: levitate 0.6s ease forwards;
+}
+
+.logo-mark:hover {
+  animation: spin 0.6s ease;
 }
 .summary-card[data-index="0"] { animation-delay: 0ms; }
 .summary-card[data-index="1"] { animation-delay: 120ms; }
@@ -379,6 +399,9 @@ table th {
   top: 0;
   height: 100vh;
   flex-shrink: 0;
+  will-change: transform;
+  transform: translateZ(0);
+  transition: transform 0.25s cubic-bezier(0.4,0,0.2,1);
 }
 
 .main-content {
@@ -396,15 +419,25 @@ table th {
 }
 
 .mobile-overlay {
-  display: none;
   position: fixed;
   top: 0;
   left: 0;
   right: 0;
   bottom: 0;
   background: rgba(0, 0, 0, 0.6);
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.25s ease;
   z-index: 190;
-  animation: overlayIn 0.2s ease-out;
+}
+
+.mobile-overlay.open {
+  opacity: 1;
+  pointer-events: all;
+}
+
+.modal {
+  will-change: transform, opacity;
 }
 
 .sidebar-wrapper .finflow-sidebar {
@@ -445,7 +478,7 @@ table th {
     height: 100vh;
     width: 260px;
     transform: translateX(-100%);
-    transition: transform 0.28s cubic-bezier(0.4,0,0.2,1);
+    transition: transform 0.25s cubic-bezier(0.4,0,0.2,1);
     z-index: 200;
     box-shadow: 2px 0 16px rgba(0, 0, 0, 0.5);
   }
@@ -456,10 +489,6 @@ table th {
 
   .hamburger {
     display: flex !important;
-  }
-
-  .mobile-overlay {
-    display: block;
   }
 
   /* Hide export button text, show icon only */

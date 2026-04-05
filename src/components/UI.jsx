@@ -28,7 +28,6 @@ export function Card({ children, style, floatIndex = 0, hover = true, className 
       className={`finflow-card ${className}`}
       style={{
         background: 'linear-gradient(160deg, rgba(22, 29, 48, 0.62), rgba(15, 21, 37, 0.46))',
-        backdropFilter: 'blur(12px)',
         borderTop: '1px solid rgba(255, 255, 255, 0.11)',
         borderRight: '1px solid rgba(169, 193, 255, 0.18)',
         borderBottom: '1px solid rgba(169, 193, 255, 0.14)',
@@ -49,7 +48,6 @@ export function Card({ children, style, floatIndex = 0, hover = true, className 
         damping: 22,
         mass: 0.9,
       }}
-      whileHover={hover ? { boxShadow: '0 24px 56px rgba(5,9,20,0.55), 0 0 0 1px rgba(110,152,255,0.22)' } : {}}
       onMouseMove={handleMouseMove}
       onMouseLeave={handleMouseLeave}
       {...rest}
@@ -76,7 +74,7 @@ export function Badge({ children, variant = 'cat' }) {
         fontSize: 10, fontWeight: 500,
         ...colors[variant],
       }}
-      whileHover={{ scale: 1.1, filter: 'brightness(1.2)' }}
+      whileHover={{ scale: 1.1 }}
       transition={{ type: 'spring', stiffness: 400, damping: 20 }}
     >
       {children}
@@ -123,8 +121,6 @@ export function Btn({ children, onClick, variant = 'ghost', style, disabled }) {
       disabled={disabled}
       whileHover={disabled ? {} : {
         y: variant === 'primary' ? -2 : 0,
-        boxShadow: variant === 'primary' ? '0 6px 20px rgba(79,143,255,0.4)' : 'none',
-        background: variant === 'primary' ? '#6fa3ff' : 'rgba(255,255,255,0.08)',
       }}
       whileTap={disabled ? {} : { scale: 0.95 }}
       transition={{ type: 'spring', stiffness: 400, damping: 20 }}
@@ -154,6 +150,7 @@ export function Modal({ open, onClose, title, children }) {
           onClick={e => { if (e.target === e.currentTarget) onClose(); }}
         >
           <motion.div
+            className="modal"
             style={mStyles.modal}
             initial={{ opacity: 0, scale: 0.88, y: 24 }}
             animate={{ opacity: 1, scale: [0.88, 1.02, 1], y: [24, -4, 0] }}
@@ -176,15 +173,13 @@ const mStyles = {
     background: 'rgba(0,0,0,0.6)',
     zIndex: 100,
     display: 'flex', alignItems: 'center', justifyContent: 'center',
-    backdropFilter: 'blur(8px)',
   },
   modal: {
-    background: 'rgba(15, 21, 37, 0.7)',
+    background: 'rgba(15, 21, 37, 0.96)',
     border: '1px solid rgba(255, 255, 255, 0.1)',
     borderRadius: 16, padding: 28,
     width: 420, maxWidth: '90vw',
     position: 'relative',
-    backdropFilter: 'blur(12px)',
   },
   title: { fontSize: 16, fontWeight: 600, marginBottom: 20, color: 'var(--text)' },
   close: {
@@ -220,11 +215,10 @@ export function Input({ style, ...props }) {
         color: 'var(--text)', padding: '9px 12px',
         fontSize: 13, fontFamily: 'var(--font-sans)', outline: 'none',
         transition: 'all 0.2s',
-        backdropFilter: 'blur(4px)',
         ...style,
       }}
-      onFocus={e => { e.target.style.borderColor = 'rgba(79, 143, 255, 0.3)'; e.target.style.boxShadow = '0 0 0 3px rgba(79,143,255,0.1)'; e.target.style.backdropFilter = 'blur(8px)'; }}
-      onBlur={e =>  { e.target.style.borderColor = 'rgba(255, 255, 255, 0.1)'; e.target.style.boxShadow = ''; e.target.style.backdropFilter = 'blur(4px)'; }}
+      onFocus={e => { e.target.style.borderColor = 'rgba(79, 143, 255, 0.3)'; e.target.style.boxShadow = '0 0 0 3px rgba(79,143,255,0.1)'; }}
+      onBlur={e =>  { e.target.style.borderColor = 'rgba(255, 255, 255, 0.1)'; e.target.style.boxShadow = ''; }}
       {...props}
     />
   );
@@ -239,11 +233,10 @@ export function Select({ style, children, ...props }) {
         color: 'var(--text)', padding: '9px 12px',
         fontSize: 13, fontFamily: 'var(--font-sans)', outline: 'none',
         cursor: 'pointer', transition: 'all 0.2s',
-        backdropFilter: 'blur(4px)',
         ...style,
       }}
-      onFocus={e => { e.target.style.borderColor = 'rgba(79, 143, 255, 0.3)'; e.target.style.backdropFilter = 'blur(8px)'; }}
-      onBlur={e =>  { e.target.style.borderColor = 'rgba(255, 255, 255, 0.1)'; e.target.style.backdropFilter = 'blur(4px)'; }}
+      onFocus={e => { e.target.style.borderColor = 'rgba(79, 143, 255, 0.3)'; }}
+      onBlur={e =>  { e.target.style.borderColor = 'rgba(255, 255, 255, 0.1)'; }}
       {...props}
     >
       {children}
@@ -303,7 +296,6 @@ export function Toast({ message, visible }) {
             zIndex: 200,
             display: 'flex', alignItems: 'center', gap: 8,
             pointerEvents: 'none',
-            backdropFilter: 'blur(12px)',
           }}
           initial={{ opacity: 0, y: 40, scale: 0.9 }}
           animate={{ opacity: 1, y: 0,  scale: 1   }}

@@ -17,7 +17,6 @@ const CHART_OPTS = {
     tooltip: {
       backgroundColor: 'rgba(15, 21, 37, 0.8)', titleColor: '#e8eaf2',
       bodyColor: '#7b82a0', borderColor: 'rgba(255,255,255,0.15)', borderWidth: 1,
-      backdropFilter: 'blur(8px)',
       padding: 10,
     },
   },

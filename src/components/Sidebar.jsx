@@ -1,5 +1,4 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { motion } from 'framer-motion';
 import { useLang } from '../context/LangContext';
 
 const NAV_ITEMS = [
@@ -44,7 +43,7 @@ export default function Sidebar({ active, onNavigate, role, onRoleChange, setSid
     <aside style={styles.sidebar} className="finflow-sidebar">
       {/* Logo */}
       <div style={styles.logo}>
-        <div style={styles.logoMark}>F</div>
+        <div className="logo-mark" style={styles.logoMark}>F</div>
         <div>
           <div style={styles.logoText}>{t('sidebar.appName')}</div>
           <div style={styles.logoSub}>{t('sidebar.appSub')}</div>
@@ -56,7 +55,7 @@ export default function Sidebar({ active, onNavigate, role, onRoleChange, setSid
         <div style={styles.navLabel}>{t('sidebar.menu')}</div>
         <div ref={listRef} style={{ position: 'relative' }}>
           {/* Sliding Active Indicator */}
-          <motion.div
+          <div
             style={{
               position: 'absolute',
               left: 12,
@@ -65,11 +64,10 @@ export default function Sidebar({ active, onNavigate, role, onRoleChange, setSid
               borderRadius: 8,
               background: 'rgba(79,143,255,0.12)',
               border: '1px solid rgba(139, 171, 255, 0.24)',
-              backdropFilter: 'blur(8px)',
+              transition: 'transform 0.25s cubic-bezier(0.4,0,0.2,1)',
+              transform: `translateY(${yOffset - 8}px)`,
               zIndex: 0,
             }}
-            animate={{ y: yOffset - 8 }}
-            transition={{ type: 'spring', stiffness: 400, damping: 35 }}
           />
           {NAV_ITEMS.map((item, i) => (
             <button
@@ -141,8 +139,7 @@ export default function Sidebar({ active, onNavigate, role, onRoleChange, setSid
 const styles = {
   sidebar: {
     width: '100%', minWidth: '100%',
-    background: 'linear-gradient(185deg, rgba(15, 21, 37, 0.68), rgba(15, 21, 37, 0.5))',
-    backdropFilter: 'blur(12px) saturate(130%)',
+    background: 'rgba(15, 21, 37, 0.96)',
     borderRight: '1px solid rgba(171, 194, 255, 0.18)',
     display: 'flex', flexDirection: 'column',
     height: '100%',
@@ -161,7 +158,7 @@ const styles = {
     borderRadius: 8,
     display: 'flex', alignItems: 'center', justifyContent: 'center',
     fontSize: 16, fontWeight: 700, color: '#fff',
-    animation: 'orbitSpin 12s linear infinite',
+    cursor: 'pointer',
   },
   logoText: { fontSize: 15, fontWeight: 600, color: 'var(--text)', letterSpacing: '-0.3px' },
   logoSub:  { fontSize: 10, color: 'var(--muted)', letterSpacing: '0.5px', textTransform: 'uppercase' },
@@ -202,7 +199,6 @@ const styles = {
   roleSelect: {
     width: '100%',
     background: 'rgba(22, 29, 48, 0.5)',
-    backdropFilter: 'blur(8px)',
     border: '1px solid rgba(255, 255, 255, 0.1)',
     borderRadius: 8,
     color: 'var(--text)',

@@ -73,13 +73,11 @@ export default function App() {
   return (
     <div className="app-shell" style={{ display: 'flex', minHeight: '100vh' }}>
       {/* Dark Overlay for Mobile */}
-      {sidebarOpen && (
-        <div
-          className="mobile-overlay"
-          onClick={() => setSidebarOpen(false)}
-          aria-label="Close sidebar overlay"
-        />
-      )}
+      <div
+        className={`mobile-overlay ${sidebarOpen ? 'open' : ''}`}
+        onClick={() => setSidebarOpen(false)}
+        aria-label="Close sidebar overlay"
+      />
 
       <div className={`sidebar-wrapper ${sidebarOpen ? 'open' : ''}`}>
         <Sidebar
@@ -96,7 +94,6 @@ export default function App() {
         {/* Topbar */}
         <div className="topbar" style={{
           background: 'linear-gradient(180deg, rgba(15, 21, 37, 0.86), rgba(15, 21, 37, 0.62))', borderBottom: '1px solid rgba(171, 194, 255, 0.18)',
-          backdropFilter: 'blur(10px) saturate(120%)',
           padding: '16px 28px', display: 'flex', alignItems: 'center', justifyContent: 'space-between',
           position: 'sticky', top: 0, zIndex: 10,
           animation: 'fadeUp 0.4s cubic-bezier(.4,0,.2,1) both',

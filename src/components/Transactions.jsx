@@ -180,11 +180,12 @@ export default function Transactions({ transactions, role, onAdd, onUpdate, onDe
                 animate="visible"
               >
                 <AnimatePresence mode="popLayout">
-                  {filtered.map((tx) => (
+                  {filtered.map((tx, index) => (
                     <motion.tr
                       key={tx.id}
                       variants={rowVariants}
                       layout
+                      transition={{ delay: Math.min(index, 10) * 0.04 }}
                       style={{
                         borderBottom: '1px solid var(--border)',
                         background:
@@ -195,7 +196,7 @@ export default function Transactions({ transactions, role, onAdd, onUpdate, onDe
                               : 'rgba(255,113,113,0.05)',
                         transition: 'background 1.8s ease',
                       }}
-                      whileHover={{ backgroundColor: tx.type === 'income' ? 'rgba(57,214,167,0.1)' : 'rgba(255,113,113,0.1)', x: 2 }}
+                      whileHover={{ x: 2 }}
                     >
                       <td style={{ padding: '12px 14px', fontSize: 11, fontFamily: 'var(--font-mono)', color: 'var(--muted)' }}>{tx.date}</td>
                       <td style={{ padding: '12px 14px', fontSize: 12, fontWeight: 500 }}>{tx.desc}</td>
