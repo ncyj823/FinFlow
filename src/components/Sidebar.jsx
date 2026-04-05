@@ -10,7 +10,7 @@ const NAV_ITEMS = [
   { id: 'ai-insights',  icon: '✦', key: 'aiInsights' },
 ];
 
-export default function Sidebar({ active, onNavigate, role, onRoleChange, setSidebar, onClose }) {
+export default function Sidebar({ active, onNavigate, role, actualRole, onRoleChange, setSidebar, onClose, user, onLogout, logoutDisabled }) {
   const { language, setLanguage, t } = useLang();
   const [activeIndex, setActiveIndex] = useState(0);
   const [yOffset, setYOffset] = useState(0);
@@ -101,6 +101,14 @@ export default function Sidebar({ active, onNavigate, role, onRoleChange, setSid
 
       {/* Footer Controls */}
       <div style={{...styles.roleSection}}>
+        {user && (
+          <div style={styles.userBlock}>
+            <div style={styles.userName}>{user.name}</div>
+            <div style={styles.userEmail}>{user.email}</div>
+            <div style={styles.currentRole}>Signed in as {actualRole === 'admin' ? t('sidebar.admin') : t('sidebar.viewer')}</div>
+          </div>
+        )}
+
         <div style={styles.roleLabel}>{t('sidebar.role')}</div>
         <select
           value={role}
@@ -131,6 +139,17 @@ export default function Sidebar({ active, onNavigate, role, onRoleChange, setSid
           <option value="hi">{t('sidebar.languageNames.hi')}</option>
           <option value="te">{t('sidebar.languageNames.te')}</option>
         </select>
+
+        <button
+          onClick={onLogout}
+          disabled={logoutDisabled}
+          style={{
+            ...styles.logoutBtn,
+            ...(logoutDisabled ? styles.logoutBtnDisabled : {}),
+          }}
+        >
+          {logoutDisabled ? 'Logging out...' : 'Logout'}
+        </button>
       </div>
     </aside>
   );
@@ -192,6 +211,31 @@ const styles = {
     borderTop: '1px solid rgba(171, 194, 255, 0.16)',
     animation: 'roleSectionFadeIn 0.4s cubic-bezier(0.4, 0, 0.2, 1) 0.5s both',
   },
+  userBlock: {
+    marginBottom: 14,
+    padding: '10px 12px',
+    borderRadius: 10,
+    background: 'linear-gradient(180deg, rgba(22, 29, 48, 0.6), rgba(15, 21, 37, 0.8))',
+    border: '1px solid rgba(171, 194, 255, 0.2)',
+  },
+  userName: {
+    fontSize: 13,
+    fontWeight: 600,
+    color: 'var(--text)',
+  },
+  userEmail: {
+    marginTop: 2,
+    fontSize: 11,
+    color: 'var(--muted)',
+    wordBreak: 'break-word',
+  },
+  currentRole: {
+    marginTop: 7,
+    fontSize: 10,
+    color: 'var(--accent)',
+    textTransform: 'uppercase',
+    letterSpacing: 0.8,
+  },
   roleLabel: {
     fontSize: 10, letterSpacing: 1, textTransform: 'uppercase',
     color: 'var(--muted)', marginBottom: 8,
@@ -213,6 +257,22 @@ const styles = {
     display: 'inline-flex', alignItems: 'center', gap: 5,
     marginTop: 8, padding: '4px 10px',
     borderRadius: 20, fontSize: 11, fontWeight: 500,
+  },
+  logoutBtn: {
+    marginTop: 14,
+    width: '100%',
+    border: '1px solid rgba(255, 113, 113, 0.35)',
+    background: 'rgba(255, 113, 113, 0.08)',
+    color: '#ffb8b8',
+    borderRadius: 8,
+    padding: '9px 10px',
+    fontSize: 12,
+    cursor: 'pointer',
+    transition: 'all 0.2s ease',
+  },
+  logoutBtnDisabled: {
+    opacity: 0.65,
+    cursor: 'not-allowed',
   },
   badgeAdmin:  { background: 'rgba(124,92,252,0.2)', color: 'var(--accent2)' },
   badgeViewer: { background: 'rgba(79,143,255,0.15)', color: 'var(--accent)' },
