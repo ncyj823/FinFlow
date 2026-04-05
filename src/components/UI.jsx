@@ -6,10 +6,10 @@ export function Card({ children, style, floatIndex = 0, hover = true, className 
   const ref = useRef(null);
   const x = useMotionValue(0);
   const y = useMotionValue(0);
-  const rotateX = useTransform(y, [-0.5, 0.5], [6, -6]);
-  const rotateY = useTransform(x, [-0.5, 0.5], [-6, 6]);
-  const springRotX = useSpring(rotateX, { stiffness: 300, damping: 30 });
-  const springRotY = useSpring(rotateY, { stiffness: 300, damping: 30 });
+  const rotateX = useTransform(y, [-0.5, 0.5], [8, -8]);
+  const rotateY = useTransform(x, [-0.5, 0.5], [-8, 8]);
+  const springRotX = useSpring(rotateX, { stiffness: 320, damping: 28 });
+  const springRotY = useSpring(rotateY, { stiffness: 320, damping: 28 });
 
   const handleMouseMove = useCallback((e) => {
     if (!hover || !ref.current) return;
@@ -27,9 +27,12 @@ export function Card({ children, style, floatIndex = 0, hover = true, className 
       ref={ref}
       className={`finflow-card ${className}`}
       style={{
-        background: 'rgba(15, 21, 37, 0.4)',
+        background: 'linear-gradient(160deg, rgba(22, 29, 48, 0.62), rgba(15, 21, 37, 0.46))',
         backdropFilter: 'blur(12px)',
-        border: '1px solid rgba(255, 255, 255, 0.08)',
+        borderTop: '1px solid rgba(255, 255, 255, 0.11)',
+        borderRight: '1px solid rgba(169, 193, 255, 0.18)',
+        borderBottom: '1px solid rgba(169, 193, 255, 0.14)',
+        borderLeft: '1px solid rgba(255, 255, 255, 0.08)',
         borderRadius: 12,
         padding: '20px 22px',
         transformStyle: 'preserve-3d',
@@ -37,10 +40,16 @@ export function Card({ children, style, floatIndex = 0, hover = true, className 
         rotateY: hover ? springRotY : 0,
         ...style,
       }}
-      initial={{ opacity: 0, y: 20, scale: 0.97 }}
-      animate={{ opacity: 1, y: 0,  scale: 1 }}
-      transition={{ delay: floatIndex * 0.07, duration: 0.45, ease: [0.4, 0, 0.2, 1] }}
-      whileHover={hover ? { boxShadow: '0 20px 48px rgba(79,143,255,0.1), 0 0 0 1px rgba(79,143,255,0.15)' } : {}}
+      initial={{ opacity: 0, y: 16, scale: 0.94 }}
+      animate={{ opacity: 1, y: 0, scale: 1 }}
+      transition={{
+        delay: floatIndex * 0.07,
+        type: 'spring',
+        stiffness: 260,
+        damping: 22,
+        mass: 0.9,
+      }}
+      whileHover={hover ? { boxShadow: '0 24px 56px rgba(5,9,20,0.55), 0 0 0 1px rgba(110,152,255,0.22)' } : {}}
       onMouseMove={handleMouseMove}
       onMouseLeave={handleMouseLeave}
       {...rest}
@@ -147,9 +156,9 @@ export function Modal({ open, onClose, title, children }) {
           <motion.div
             style={mStyles.modal}
             initial={{ opacity: 0, scale: 0.88, y: 24 }}
-            animate={{ opacity: 1, scale: 1,    y: 0  }}
+            animate={{ opacity: 1, scale: [0.88, 1.02, 1], y: [24, -4, 0] }}
             exit={{   opacity: 0, scale: 0.92,  y: 16 }}
-            transition={{ type: 'spring', stiffness: 380, damping: 28 }}
+            transition={{ duration: 0.42, times: [0, 0.7, 1], ease: [0.22, 1, 0.36, 1] }}
           >
             <button style={mStyles.close} onClick={onClose}>✕</button>
             <div style={mStyles.title}>{title}</div>

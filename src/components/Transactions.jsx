@@ -3,8 +3,10 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { Card, Badge, Btn, Modal, Field, Input, Select, EmptyState } from './UI';
 import { CATEGORIES } from '../data/mockData';
 import { useUIStore } from '../store/uiStore';
+import { useLang } from '../context/LangContext';
 
 function TxModal({ open, onClose, onSave, editing }) {
+  const { t } = useLang();
   const [desc, setDesc] = useState(editing?.desc || '');
   const [amt,  setAmt]  = useState(editing?.amount || '');
   const [date, setDate] = useState(editing?.date || new Date().toISOString().split('T')[0]);
@@ -23,34 +25,34 @@ function TxModal({ open, onClose, onSave, editing }) {
   };
 
   return (
-    <Modal open={open} onClose={onClose} title={editing ? 'Edit Transaction' : 'Add Transaction'}>
-      <Field label="Description">
-        <Input value={desc} onChange={e => setDesc(e.target.value)} placeholder="e.g. Netflix subscription" />
+    <Modal open={open} onClose={onClose} title={editing ? t('transactions.modal.editTitle') : t('transactions.modal.addTitle')}>
+      <Field label={t('transactions.modal.descLabel')}>
+        <Input value={desc} onChange={e => setDesc(e.target.value)} placeholder={t('transactions.modal.descPlaceholder')} />
       </Field>
       <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12 }}>
-        <Field label="Amount (₹)">
+        <Field label={t('transactions.modal.amountLabel')}>
           <Input type="number" value={amt} onChange={e => setAmt(e.target.value)} placeholder="0.00" min="0" step="0.01" />
         </Field>
-        <Field label="Date">
+        <Field label={t('transactions.modal.dateLabel')}>
           <Input type="date" value={date} onChange={e => setDate(e.target.value)} />
         </Field>
       </div>
       <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12 }}>
-        <Field label="Type">
+        <Field label={t('transactions.modal.typeLabel')}>
           <Select value={type} onChange={e => setType(e.target.value)}>
-            <option value="expense">Expense</option>
-            <option value="income">Income</option>
+            <option value="expense">{t('common.expense')}</option>
+            <option value="income">{t('common.income')}</option>
           </Select>
         </Field>
-        <Field label="Category">
+        <Field label={t('transactions.modal.categoryLabel')}>
           <Select value={cat} onChange={e => setCat(e.target.value)}>
             {CATEGORIES.map(c => <option key={c}>{c}</option>)}
           </Select>
         </Field>
       </div>
       <div style={{ display: 'flex', gap: 10, marginTop: 24, justifyContent: 'flex-end' }}>
-        <Btn onClick={onClose}>Cancel</Btn>
-        <Btn variant="primary" onClick={handleSave}>{editing ? 'Save Changes' : 'Save Transaction'}</Btn>
+        <Btn onClick={onClose}>{t('common.cancel')}</Btn>
+        <Btn variant="primary" onClick={handleSave}>{editing ? t('common.saveChanges') : t('transactions.modal.saveAdd')}</Btn>
       </div>
     </Modal>
   );
@@ -68,6 +70,7 @@ const rowVariants = {
 };
 
 export default function Transactions({ transactions, role, onAdd, onUpdate, onDelete, onToast }) {
+  const { t } = useLang();
   const [search, setSearch]   = useState('');
   const [typeF,  setTypeF]    = useState('');
   const [catF,   setCatF]     = useState('');
@@ -90,12 +93,12 @@ export default function Transactions({ transactions, role, onAdd, onUpdate, onDe
     });
 
   const handleSave = (data) => {
-    if (editing) { onUpdate(editing.id, data); onToast('✏️ Transaction updated'); }
-    else         { onAdd(data);               onToast('✅ Transaction added');   }
+    if (editing) { onUpdate(editing.id, data); onToast(`✏️ ${t('toasts.txUpdated')}`); }
+    else         { onAdd(data);               onToast(`✅ ${t('toasts.txAdded')}`);   }
     setEditing(null);
   };
 
-  const handleDelete = (id) => { onDelete(id); onToast('🗑️ Transaction deleted'); };
+  const handleDelete = (id) => { onDelete(id); onToast(`🗑️ ${t('toasts.txDeleted')}`); };
 
   const inputStyle = {
     background: 'var(--surface2)', border: '1px solid var(--border2)',
@@ -117,44 +120,54 @@ export default function Transactions({ transactions, role, onAdd, onUpdate, onDe
         <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 16, flexWrap: 'wrap' }}>
           <input
             value={search} onChange={e => setSearch(e.target.value)}
-            placeholder="Search transactions…"
+            placeholder={t('transactions.searchPlaceholder')}
             style={{ ...inputStyle, flex: 1, minWidth: 180 }}
           />
           <select value={typeF} onChange={e => setTypeF(e.target.value)} style={inputStyle}>
-            <option value="">All Types</option>
-            <option value="income">Income</option>
-            <option value="expense">Expense</option>
+            <option value="">{t('common.allTypes')}</option>
+            <option value="income">{t('common.income')}</option>
+            <option value="expense">{t('common.expense')}</option>
           </select>
           <select value={catF} onChange={e => setCatF(e.target.value)} style={inputStyle}>
-            <option value="">All Categories</option>
+            <option value="">{t('common.allCategories')}</option>
             {CATEGORIES.map(c => <option key={c}>{c}</option>)}
           </select>
           <select value={sort} onChange={e => setSort(e.target.value)} style={inputStyle}>
-            <option value="date-desc">Newest First</option>
-            <option value="date-asc">Oldest First</option>
-            <option value="amount-desc">Highest Amount</option>
-            <option value="amount-asc">Lowest Amount</option>
+            <option value="date-desc">{t('transactions.sort.newest')}</option>
+            <option value="date-asc">{t('transactions.sort.oldest')}</option>
+            <option value="amount-desc">{t('transactions.sort.highest')}</option>
+            <option value="amount-asc">{t('transactions.sort.lowest')}</option>
           </select>
           {role === 'admin' && (
-            <Btn variant="primary" onClick={() => { setEditing(null); setModal(true); }}>+ Add</Btn>
+            <Btn variant="primary" onClick={() => { setEditing(null); setModal(true); }}>+ {t('transactions.add')}</Btn>
           )}
         </div>
 
         {/* Table */}
         {filtered.length === 0 ? (
-          <EmptyState icon="🔍" sub="No transactions match your filters." />
+          <EmptyState icon="🔍" title={t('transactions.empty.title')} sub={t('transactions.empty.sub')} />
         ) : (
           <>
+            {(() => {
+              const headers = [
+                { label: t('transactions.headers.date'), alignRight: false },
+                { label: t('transactions.headers.description'), alignRight: false },
+                { label: t('transactions.headers.category'), alignRight: false },
+                { label: t('transactions.headers.type'), alignRight: false },
+                { label: t('transactions.headers.amount'), alignRight: true },
+                ...(role === 'admin' ? [{ label: t('transactions.headers.actions'), alignRight: true }] : []),
+              ];
+              return (
             <table style={{ width: '100%', borderCollapse: 'collapse' }}>
               <thead>
                 <tr>
-                  {['Date','Description','Category','Type','Amount', ...(role === 'admin' ? ['Actions'] : [])].map(h => (
-                    <th key={h} style={{
+                  {headers.map(h => (
+                    <th key={h.label} style={{
                       fontSize: 11, letterSpacing: '0.5px', textTransform: 'uppercase',
                       color: 'var(--muted)', fontWeight: 500, padding: '10px 14px',
-                      textAlign: h === 'Amount' || h === 'Actions' ? 'right' : 'left',
+                      textAlign: h.alignRight ? 'right' : 'left',
                       borderBottom: '1px solid var(--border)',
-                    }}>{h}</th>
+                    }}>{h.label}</th>
                   ))}
                 </tr>
               </thead>
@@ -167,29 +180,34 @@ export default function Transactions({ transactions, role, onAdd, onUpdate, onDe
                 animate="visible"
               >
                 <AnimatePresence mode="popLayout">
-                  {filtered.map((t) => (
+                  {filtered.map((tx) => (
                     <motion.tr
-                      key={t.id}
+                      key={tx.id}
                       variants={rowVariants}
                       layout
                       style={{
                         borderBottom: '1px solid var(--border)',
-                        background: t.id === lastAddedId ? 'rgba(45,212,160,0.08)' : '',
+                        background:
+                          tx.id === lastAddedId
+                            ? 'rgba(45,212,160,0.1)'
+                            : tx.type === 'income'
+                              ? 'rgba(57,214,167,0.05)'
+                              : 'rgba(255,113,113,0.05)',
                         transition: 'background 1.8s ease',
                       }}
-                      whileHover={{ backgroundColor: 'rgba(79,143,255,0.04)', x: 2 }}
+                      whileHover={{ backgroundColor: tx.type === 'income' ? 'rgba(57,214,167,0.1)' : 'rgba(255,113,113,0.1)', x: 2 }}
                     >
-                      <td style={{ padding: '12px 14px', fontSize: 11, fontFamily: 'var(--font-mono)', color: 'var(--muted)' }}>{t.date}</td>
-                      <td style={{ padding: '12px 14px', fontSize: 12, fontWeight: 500 }}>{t.desc}</td>
-                      <td style={{ padding: '12px 14px' }}><Badge variant="cat">{t.cat}</Badge></td>
-                      <td style={{ padding: '12px 14px' }}><Badge variant={t.type}>{t.type}</Badge></td>
-                      <td style={{ padding: '12px 14px', textAlign: 'right', fontFamily: 'var(--font-mono)', fontSize: 13, color: t.type === 'income' ? 'var(--green)' : 'var(--red)' }}>
-                        {t.type === 'income' ? '+' : '-'}₹{t.amount.toLocaleString('en-IN')}
+                      <td style={{ padding: '12px 14px', fontSize: 11, fontFamily: 'var(--font-mono)', color: 'var(--muted)' }}>{tx.date}</td>
+                      <td style={{ padding: '12px 14px', fontSize: 12, fontWeight: 500 }}>{tx.desc}</td>
+                      <td style={{ padding: '12px 14px' }}><Badge variant="cat">{tx.cat}</Badge></td>
+                      <td style={{ padding: '12px 14px' }}><Badge variant={tx.type}>{tx.type === 'income' ? t('common.income') : t('common.expense')}</Badge></td>
+                      <td style={{ padding: '12px 14px', textAlign: 'right', fontFamily: 'var(--font-mono)', fontSize: 13, color: tx.type === 'income' ? 'var(--green)' : 'var(--red)' }}>
+                        {tx.type === 'income' ? '+' : '-'}₹{tx.amount.toLocaleString('en-IN')}
                       </td>
                       {role === 'admin' && (
                         <td style={{ padding: '12px 14px', textAlign: 'right' }}>
-                          <Btn variant="sm" onClick={() => { setEditing(t); setModal(true); }} style={{ marginRight: 4 }}>Edit</Btn>
-                          <Btn variant="danger" onClick={() => handleDelete(t.id)} style={{ fontSize: 10, padding: '4px 8px' }}>Del</Btn>
+                          <Btn variant="sm" onClick={() => { setEditing(tx); setModal(true); }} style={{ marginRight: 4 }}>{t('common.edit')}</Btn>
+                          <Btn variant="danger" onClick={() => handleDelete(tx.id)} style={{ fontSize: 10, padding: '4px 8px' }}>{t('common.deleteShort')}</Btn>
                         </td>
                       )}
                     </motion.tr>
@@ -197,12 +215,14 @@ export default function Transactions({ transactions, role, onAdd, onUpdate, onDe
                 </AnimatePresence>
               </motion.tbody>
             </table>
+              );
+            })()}
 
             <motion.div
               style={{ fontSize: 11, color: 'var(--muted)', padding: '12px 14px 0' }}
               initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.3 }}
             >
-              Showing {filtered.length} of {transactions.length} transactions
+              {t('transactions.showing', { filtered: filtered.length, total: transactions.length })}
             </motion.div>
           </>
         )}

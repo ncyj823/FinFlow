@@ -2,8 +2,10 @@ import React, { useState, useEffect } from 'react';
 import { Bar } from 'react-chartjs-2';
 import { Card } from './UI';
 import { CAT_COLORS } from '../data/mockData';
+import { useLang } from '../context/LangContext';
 
 export default function Insights({ transactions }) {
+  const { t } = useLang();
   const [mounted, setMounted] = useState(false);
 
   useEffect(() => {
@@ -27,15 +29,15 @@ export default function Insights({ transactions }) {
   const monthlyData = {
     labels: ['Nov','Dec','Jan','Feb','Mar','Apr'],
     datasets: [
-      { label: 'Income',   data: [5200,5800,6400,7100,7520,8450], backgroundColor: 'rgba(45,212,160,0.7)',  borderRadius: 4, barPercentage: 0.6 },
-      { label: 'Expenses', data: [3800,4100,4200,4000,3640,3820], backgroundColor: 'rgba(240,106,106,0.7)', borderRadius: 4, barPercentage: 0.6 },
+      { label: t('common.income'),   data: [5200,5800,6400,7100,7520,8450], backgroundColor: 'rgba(45,212,160,0.7)',  borderRadius: 4, barPercentage: 0.6 },
+      { label: t('common.expense'), data: [3800,4100,4200,4000,3640,3820], backgroundColor: 'rgba(240,106,106,0.7)', borderRadius: 4, barPercentage: 0.6 },
     ],
   };
 
   const insightCards = [
-    { icon: '🏆', label: 'Top Spending Category', value: topCat?.[0], desc: `$${topCat?.[1].toFixed(0)} total · ${((topCat?.[1]/totalExp)*100).toFixed(0)}% of expenses`, color: 'var(--red)',   accent: 'var(--red)' },
-    { icon: '💰', label: 'Monthly Savings',       value: `$${savings.toFixed(0)}`,  desc: `${savingsRate}% savings rate this month`,           color: 'var(--green)', accent: 'var(--green)' },
-    { icon: '📊', label: 'Avg Transaction',       value: `$${avgExp}`,              desc: `Across ${expenses.length} expense entries`,         color: 'var(--accent)',accent: 'var(--accent)' },
+    { icon: '🏆', label: t('insights.cards.topSpend'), value: topCat?.[0], desc: t('insights.topSpendDesc', { amount: topCat?.[1]?.toFixed(0) || 0, pct: totalExp ? ((topCat?.[1] / totalExp) * 100).toFixed(0) : 0 }), color: 'var(--red)',   accent: 'var(--red)' },
+    { icon: '💰', label: t('insights.cards.monthlySavings'), value: `$${savings.toFixed(0)}`,  desc: t('insights.savingsDesc', { rate: savingsRate }), color: 'var(--green)', accent: 'var(--green)' },
+    { icon: '📊', label: t('insights.cards.avgTx'), value: `$${avgExp}`, desc: t('insights.avgDesc', { count: expenses.length }), color: 'var(--accent)',accent: 'var(--accent)' },
   ];
 
   return (
@@ -54,10 +56,10 @@ export default function Insights({ transactions }) {
 
       {/* Monthly Bar Chart */}
       <Card floatIndex={3} hover={false} style={{ marginBottom: 24 }}>
-        <div style={{ fontSize: 14, fontWeight: 500, color: 'var(--text)', marginBottom: 4 }}>Monthly Income vs Expenses</div>
-        <div style={{ fontSize: 11, color: 'var(--muted)', marginBottom: 16 }}>6-month comparison</div>
+        <div style={{ fontSize: 14, fontWeight: 500, color: 'var(--text)', marginBottom: 4 }}>{t('insights.chartTitle')}</div>
+        <div style={{ fontSize: 11, color: 'var(--muted)', marginBottom: 16 }}>{t('insights.chartSub')}</div>
         <div style={{ display: 'flex', gap: 12, marginBottom: 16 }}>
-          {[['#2dd4a0','Income'],['#f06a6a','Expenses']].map(([c,l]) => (
+          {[['#2dd4a0', t('common.income')], ['#f06a6a', t('common.expense')]].map(([c,l]) => (
             <div key={l} style={{ display: 'flex', alignItems: 'center', gap: 5, fontSize: 11, color: 'var(--muted)' }}>
               <div style={{ width: 8, height: 8, borderRadius: 2, background: c }} />{l}
             </div>
@@ -77,7 +79,7 @@ export default function Insights({ transactions }) {
 
       {/* Spending Distribution */}
       <Card floatIndex={4} hover={false}>
-        <div style={{ fontSize: 14, fontWeight: 500, color: 'var(--text)', marginBottom: 16 }}>Spending Distribution</div>
+        <div style={{ fontSize: 14, fontWeight: 500, color: 'var(--text)', marginBottom: 16 }}>{t('insights.spendDist')}</div>
         {sortedCats.map(([cat, amt], i) => (
           <div key={cat} style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 12, animation: `fadeUp 0.35s ${i * 0.06}s both` }}>
             <div style={{ fontSize: 12, color: 'var(--text)', width: 100, flexShrink: 0 }}>{cat}</div>

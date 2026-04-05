@@ -1,15 +1,18 @@
 import React, { useState, useEffect, useRef } from 'react';
+import { motion } from 'framer-motion';
+import { useLang } from '../context/LangContext';
 
 const NAV_ITEMS = [
-  { id: 'dashboard',    icon: '◈', label: 'Dashboard' },
-  { id: 'transactions', icon: '⇄', label: 'Transactions' },
-  { id: 'insights',     icon: '◎', label: 'Insights' },
-  { id: 'budgets',      icon: '▦', label: 'Budgets' },
-  { id: 'recurring',    icon: '↺', label: 'Recurring' },
-  { id: 'ai-insights',  icon: '✦', label: 'AI Insights' },
+  { id: 'dashboard',    icon: '◈', key: 'dashboard' },
+  { id: 'transactions', icon: '⇄', key: 'transactions' },
+  { id: 'insights',     icon: '◎', key: 'insights' },
+  { id: 'budgets',      icon: '▦', key: 'budgets' },
+  { id: 'recurring',    icon: '↺', key: 'recurring' },
+  { id: 'ai-insights',  icon: '✦', key: 'aiInsights' },
 ];
 
 export default function Sidebar({ active, onNavigate, role, onRoleChange, sidebarOpen }) {
+  const { language, setLanguage, t } = useLang();
   const [activeIndex, setActiveIndex] = useState(0);
   const [yOffset, setYOffset] = useState(0);
   const [roleBadgeKey, setRoleBadgeKey] = useState(0);
@@ -43,17 +46,17 @@ export default function Sidebar({ active, onNavigate, role, onRoleChange, sideba
       <div style={styles.logo}>
         <div style={styles.logoMark}>F</div>
         <div>
-          <div style={styles.logoText}>FinFlow</div>
-          <div style={styles.logoSub}>Finance Tracker</div>
+          <div style={styles.logoText}>{t('sidebar.appName')}</div>
+          <div style={styles.logoSub}>{t('sidebar.appSub')}</div>
         </div>
       </div>
 
       {/* Nav */}
       <nav style={styles.nav}>
-        <div style={styles.navLabel}>Menu</div>
+        <div style={styles.navLabel}>{t('sidebar.menu')}</div>
         <div ref={listRef} style={{ position: 'relative' }}>
           {/* Sliding Active Indicator */}
-          <div
+          <motion.div
             style={{
               position: 'absolute',
               left: 12,
@@ -61,10 +64,12 @@ export default function Sidebar({ active, onNavigate, role, onRoleChange, sideba
               height: 36,
               borderRadius: 8,
               background: 'rgba(79,143,255,0.12)',
-              transform: `translateY(${yOffset - 8}px)`,
-              transition: 'transform 300ms cubic-bezier(0.34, 1.56, 0.64, 1)',
+              border: '1px solid rgba(139, 171, 255, 0.24)',
+              backdropFilter: 'blur(8px)',
               zIndex: 0,
             }}
+            animate={{ y: yOffset - 8 }}
+            transition={{ type: 'spring', stiffness: 400, damping: 35 }}
           />
           {NAV_ITEMS.map((item, i) => (
             <button
@@ -86,22 +91,22 @@ export default function Sidebar({ active, onNavigate, role, onRoleChange, sideba
               }}
             >
               <span style={styles.navIcon}>{item.icon}</span>
-              {item.label}
+              {t(`sidebar.nav.${item.key}`)}
             </button>
           ))}
         </div>
       </nav>
 
-      {/* Role */}
+      {/* Footer Controls */}
       <div style={{...styles.roleSection}}>
-        <div style={styles.roleLabel}>Role</div>
+        <div style={styles.roleLabel}>{t('sidebar.role')}</div>
         <select
           value={role}
           onChange={e => handleRoleChange(e.target.value)}
           style={styles.roleSelect}
         >
-          <option value="admin">Admin</option>
-          <option value="viewer">Viewer</option>
+          <option value="admin">{t('sidebar.admin')}</option>
+          <option value="viewer">{t('sidebar.viewer')}</option>
         </select>
         <div
           key={roleBadgeKey}
@@ -111,8 +116,19 @@ export default function Sidebar({ active, onNavigate, role, onRoleChange, sideba
             animation: 'roleBadgeAnim 0.35s cubic-bezier(0.34, 1.56, 0.64, 1) both',
           }}
         >
-          ● {role === 'admin' ? 'Admin Access' : 'View Only'}
+          ● {role === 'admin' ? t('sidebar.adminAccess') : t('sidebar.viewOnly')}
         </div>
+
+        <div style={{ ...styles.roleLabel, marginTop: 14 }}>{t('sidebar.language')}</div>
+        <select
+          value={language}
+          onChange={e => setLanguage(e.target.value)}
+          style={styles.roleSelect}
+        >
+          <option value="en">{t('sidebar.languageNames.en')}</option>
+          <option value="hi">{t('sidebar.languageNames.hi')}</option>
+          <option value="te">{t('sidebar.languageNames.te')}</option>
+        </select>
       </div>
     </aside>
   );
@@ -121,9 +137,9 @@ export default function Sidebar({ active, onNavigate, role, onRoleChange, sideba
 const styles = {
   sidebar: {
     width: 220, minWidth: 220,
-    background: 'rgba(15, 21, 37, 0.5)',
-    backdropFilter: 'blur(12px)',
-    borderRight: '1px solid rgba(255, 255, 255, 0.08)',
+    background: 'linear-gradient(185deg, rgba(15, 21, 37, 0.68), rgba(15, 21, 37, 0.5))',
+    backdropFilter: 'blur(12px) saturate(130%)',
+    borderRight: '1px solid rgba(171, 194, 255, 0.18)',
     display: 'flex', flexDirection: 'column',
     position: 'sticky', top: 0, height: '100vh',
     overflowY: 'auto',
@@ -131,7 +147,7 @@ const styles = {
   },
   logo: {
     padding: '24px 20px 20px',
-    borderBottom: '1px solid rgba(255, 255, 255, 0.08)',
+    borderBottom: '1px solid rgba(171, 194, 255, 0.16)',
     display: 'flex', alignItems: 'center', gap: 10,
     animation: 'logoFadeIn 0.4s cubic-bezier(0.4, 0, 0.2, 1) 0.15s both',
   },
@@ -164,7 +180,7 @@ const styles = {
     animation: 'navItemSlide 0.35s cubic-bezier(0.4, 0, 0.2, 1) both',
   },
   navItemActive: {
-    background: 'rgba(79,143,255,0.12)',
+    background: 'rgba(79,143,255,0.15)',
     color: 'var(--accent)',
     fontWeight: 500,
   },
@@ -172,7 +188,7 @@ const styles = {
 
   roleSection: {
     padding: 16,
-    borderTop: '1px solid rgba(255, 255, 255, 0.08)',
+    borderTop: '1px solid rgba(171, 194, 255, 0.16)',
     animation: 'roleSectionFadeIn 0.4s cubic-bezier(0.4, 0, 0.2, 1) 0.5s both',
   },
   roleLabel: {
