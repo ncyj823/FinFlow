@@ -71,27 +71,28 @@ export default function App() {
   ];
 
   return (
-    <div style={{ display: 'flex', minHeight: '100vh' }}>
+    <div className="app-shell" style={{ display: 'flex', minHeight: '100vh' }}>
       {/* Dark Overlay for Mobile */}
       {sidebarOpen && (
         <div
+          className="mobile-overlay"
           onClick={() => setSidebarOpen(false)}
-          style={{
-            position: 'fixed',
-            top: 0,
-            left: 0,
-            right: 0,
-            bottom: 0,
-            background: 'rgba(0,0,0,0.6)',
-            zIndex: 39,
-            animation: 'overlayIn 0.2s ease-out',
-          }}
+          aria-label="Close sidebar overlay"
         />
       )}
 
-      <Sidebar active={page} onNavigate={(id) => { setPage(id); setSidebarOpen(false); }} role={role} onRoleChange={handleRoleChange} sidebarOpen={sidebarOpen} />
+      <div className={`sidebar-wrapper ${sidebarOpen ? 'open' : ''}`}>
+        <Sidebar
+          active={page}
+          onNavigate={(id) => setPage(id)}
+          role={role}
+          onRoleChange={handleRoleChange}
+          setSidebar={setSidebarOpen}
+          onClose={() => setSidebarOpen(false)}
+        />
+      </div>
 
-      <div style={{ flex: 1, display: 'flex', flexDirection: 'column', overflow: 'hidden' }}>
+      <div className="main-content" style={{ flex: 1, display: 'flex', flexDirection: 'column', overflow: 'hidden' }}>
         {/* Topbar */}
         <div className="topbar" style={{
           background: 'linear-gradient(180deg, rgba(15, 21, 37, 0.86), rgba(15, 21, 37, 0.62))', borderBottom: '1px solid rgba(171, 194, 255, 0.18)',
@@ -103,9 +104,8 @@ export default function App() {
           <div style={{ display: 'flex', alignItems: 'center', gap: 12, flex: 1 }}>
             <button
               onClick={() => setSidebarOpen(!sidebarOpen)}
-              className="hamburger-btn"
+              className="hamburger"
               style={{
-                display: 'none',
                 background: 'none',
                 border: 'none',
                 color: 'var(--text)',

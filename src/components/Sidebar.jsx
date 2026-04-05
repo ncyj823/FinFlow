@@ -11,7 +11,7 @@ const NAV_ITEMS = [
   { id: 'ai-insights',  icon: '✦', key: 'aiInsights' },
 ];
 
-export default function Sidebar({ active, onNavigate, role, onRoleChange, sidebarOpen }) {
+export default function Sidebar({ active, onNavigate, role, onRoleChange, setSidebar, onClose }) {
   const { language, setLanguage, t } = useLang();
   const [activeIndex, setActiveIndex] = useState(0);
   const [yOffset, setYOffset] = useState(0);
@@ -41,7 +41,7 @@ export default function Sidebar({ active, onNavigate, role, onRoleChange, sideba
   };
 
   return (
-    <aside style={styles.sidebar} className={`finflow-sidebar ${sidebarOpen ? 'open' : ''}`}>
+    <aside style={styles.sidebar} className="finflow-sidebar">
       {/* Logo */}
       <div style={styles.logo}>
         <div style={styles.logoMark}>F</div>
@@ -80,7 +80,11 @@ export default function Sidebar({ active, onNavigate, role, onRoleChange, sideba
                 animationDelay: `${0.1 + i * 0.055}s`,
               }}
               className="nav-item-btn"
-              onClick={() => onNavigate(item.id)}
+              onClick={() => {
+                onNavigate(item.id);
+                if (typeof onClose === 'function') onClose();
+                if (typeof setSidebar === 'function') setSidebar(false);
+              }}
               onMouseEnter={e => {
                 e.currentTarget.style.transform = 'translateX(3px)';
                 e.currentTarget.style.color = 'var(--text)';
@@ -136,12 +140,12 @@ export default function Sidebar({ active, onNavigate, role, onRoleChange, sideba
 
 const styles = {
   sidebar: {
-    width: 220, minWidth: 220,
+    width: '100%', minWidth: '100%',
     background: 'linear-gradient(185deg, rgba(15, 21, 37, 0.68), rgba(15, 21, 37, 0.5))',
     backdropFilter: 'blur(12px) saturate(130%)',
     borderRight: '1px solid rgba(171, 194, 255, 0.18)',
     display: 'flex', flexDirection: 'column',
-    position: 'sticky', top: 0, height: '100vh',
+    height: '100%',
     overflowY: 'auto',
     animation: 'sidebarSlide 0.45s cubic-bezier(0.4, 0, 0.2, 1) both',
   },
