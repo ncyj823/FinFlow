@@ -1,4 +1,4 @@
-# FinFlow — Personal Finance Dashboard
+# FinFlow : Personal Finance Dashboard
 
 > A production-grade personal finance dashboard built with React 18, featuring animated UI, role-based access control, AI-powered financial advisor, multilingual support, and full CRUD operations — built as a frontend developer internship assessment.
 
